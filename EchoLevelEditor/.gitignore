@@ -1,3 +1,4 @@
-*Release
-*Debug
+*./Release
+*./Debug
+*./x64
 *.vs
