@@ -1,0 +1,7 @@
+ENTITY
+Sprite: {"player.png",64,64,5} //ARGS: tex, texWidth, texHeight, ticksPerIteration
+ENDENTITY
+
+ENTITY
+Sprite: {"player.png",64,64} //Error: non mathcing data for Sprite component
+ENDENTITY

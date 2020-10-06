@@ -1,0 +1,31 @@
+﻿  main.cpp
+C:\Users\Yuki\Documents\GitHub\EchoEngine\EchoEngine\include\PhysicsEngine.h(192,1): warning C4244: '+=': conversion from 'float' to 'T', possible loss of data
+          with
+          [
+              T=int32_t
+          ]
+C:\Users\Yuki\Documents\GitHub\EchoEngine\EchoEngine\include\PhysicsEngine.h(193,1): warning C4244: '+=': conversion from 'float' to 'T', possible loss of data
+          with
+          [
+              T=int32_t
+          ]
+C:\Users\Yuki\Documents\GitHub\EchoEngine\EchoEngine\include\PhysicsEngine.h(197,20): warning C4244: '=': conversion from 'float' to 'T', possible loss of data
+          with
+          [
+              T=int32_t
+          ]
+C:\Users\Yuki\Documents\GitHub\EchoEngine\EchoEngine\include\PhysicsEngine.h(198,20): warning C4244: '=': conversion from 'float' to 'T', possible loss of data
+          with
+          [
+              T=int32_t
+          ]
+C:\Users\Yuki\Documents\GitHub\EchoEngine\Game\main.cpp(33,43): warning C4312: 'type cast': conversion from 'EntityID' to 'void *' of greater size
+C:\Users\Yuki\Documents\GitHub\EchoEngine\Game\main.cpp(47,42): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\Yuki\Documents\GitHub\EchoEngine\Game\main.cpp(47,35): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\Yuki\Documents\GitHub\EchoEngine\Game\main.cpp(48,42): warning C4312: 'type cast': conversion from 'EntityID' to 'void *' of greater size
+  Generating code
+  1 of 478 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    1 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  Game.vcxproj -> C:\Users\Yuki\Documents\GitHub\EchoEngine\EchoEngine\x64\Release\Game.exe

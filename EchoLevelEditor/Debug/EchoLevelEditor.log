@@ -1,0 +1,6 @@
+﻿  main.cpp
+C:\Users\Yuki\Documents\GitHub\EchoEngine\EchoLevelEditor\main.cpp(74,1): warning C4297: 'appStart': function assumed not to throw an exception but does
+C:\Users\Yuki\Documents\GitHub\EchoEngine\EchoLevelEditor\main.cpp(74,1): message : __declspec(nothrow), throw(), noexcept(true), or noexcept was specified on the function
+C:\Users\Yuki\Documents\GitHub\EchoEngine\EchoLevelEditor\main.cpp(79,1): warning C4297: 'appStart': function assumed not to throw an exception but does
+C:\Users\Yuki\Documents\GitHub\EchoEngine\EchoLevelEditor\main.cpp(79,1): message : __declspec(nothrow), throw(), noexcept(true), or noexcept was specified on the function
+  EchoLevelEditor.vcxproj -> C:\Users\Yuki\Documents\GitHub\EchoEngine\EchoEngine\Debug\EchoLevelEditor.exe

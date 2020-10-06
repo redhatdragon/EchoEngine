@@ -1,0 +1,16 @@
+/#BodyID bodyID = physics.addBodyRect(128, 128, 16, 16);
+physics.setUserData(bodyID, (void*)player);
+TextureID koiTexID = TextureCodex::add("data/Textures/Koishi.png");
+ecs.emplace(player, bodyComponentID, &bodyID);
+ecs.emplace(player, playerControllerComponentID, NULL);
+ecs.emplace(player, textureComponentID, &koiTexID);
+ecs.emplace(player, detectOverlapComponentID, NULL);#/
+
+#Reserved components for the level editor
+size = [16, 16];
+texture = "data/Texture/Koishi.png";
+category = "officer";
+
+#User defined components for the game
+detectOverlap = NULL;
+health = 100;
