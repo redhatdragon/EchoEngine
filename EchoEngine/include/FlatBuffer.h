@@ -68,9 +68,7 @@ class FlatFlaggedBuffer {
 	uint32_t maxIndex = 0;
 public:
 	FlatFlaggedBuffer() {
-		for (uint32_t i = 0; i < maxLength; i++) {
-			isValid[i] = 0;
-		}
+		clear();
 	}
 	__forceinline void clear() {
 		for (uint32_t i = 0; i < maxLength; i++) {
@@ -79,19 +77,24 @@ public:
 	}
 	// Consider using in conjunction with incrementCount.
 	__forceinline uint32_t toggleFirstInvalid() {
-		for (unsigned int i = 0; i < maxLength; i++) {
-			if (isValid[i] == 0) {
-				isValid[i] = true;
-				return i;
+		uint32_t max = maxLength / 4;
+		uint32_t* bufferAs32 = (uint32_t*)&isValid[0];
+		for (unsigned int i = 0; i < max; i++) {
+			if (bufferAs32[i] == -1) continue;
+			for (unsigned int j = 0; j < 4; j++) {
+				if (isValid[i * 4 + j] == 0) {
+					setValid(i * 4 + j);
+					return i * 4 + j;
+				}
 			}
 		}
 		return -1;
 	}
 	__forceinline void setInvalid(uint32_t index) {
-		isValid[index] = false;
+		isValid[index] = 0;
 	}
 	__forceinline void setValid(uint32_t index) {
-		isValid[index] = true;
+		isValid[index] = 255;
 	}
 	__forceinline uint32_t insert(const T& component) {
 		uint32_t index = toggleFirstInvalid();
@@ -100,7 +103,7 @@ public:
 		return index;
 	}
 	__forceinline bool getIsValid(uint32_t index) {
-		return isValid[index];
+		return (bool)isValid[index];
 	}
 	__forceinline uint32_t getCount() {
 		return count;

@@ -1,18 +1,19 @@
 #pragma once
 #include "EntityObject.h"
+#include "Name.h"
 #include <string>
 #include <algorithm>
 #include <fstream>
 #include <iostream>
 
 namespace EntityObjectLoader {
-    std::string errorStr = "";
+    static std::string errorStr = "";
 
-    void removeCharsFromString(std::string& str, const char* charsToRemove) {
+    inline void removeCharsFromString(std::string& str, const char* charsToRemove) {
         for (unsigned int i = 0; i < strlen(charsToRemove); ++i)
             str.erase(remove(str.begin(), str.end(), charsToRemove[i]), str.end());
     }
-    std::vector<std::string> split(const std::string& str, const std::string& delim) {
+    inline std::vector<std::string> split(const std::string& str, const std::string& delim) {
         std::vector<std::string> tokens;
         size_t prev = 0, pos = 0;
         do {
@@ -24,14 +25,14 @@ namespace EntityObjectLoader {
         } while (pos < str.length() && prev < str.length());
         return tokens;
     }
-    bool isDigits(const std::string& s) {
+    inline bool isDigits(const std::string& s) {
         for (char c : s) if (!isdigit(c)) return false;
         return true;
     }
 
 
 
-    void cleanText(std::string& text) {
+    inline void cleanText(std::string& text) {
         {
             size_t currentIndex = 0;
             while (true) {
@@ -67,15 +68,106 @@ namespace EntityObjectLoader {
                 text.erase(pos, (endPos + 1) - pos);
             }
         }
-        removeCharsFromString(text, " \n");
+        removeCharsFromString(text, " \n\r");
     }
 
-    ComponentObject createComponentObjectFromString(const std::string& str) {
+    inline bool isTokenString(const std::string& token) {
+        unsigned int count = 0;
+        if (token[0] != '"') return false;
+        for (char c : token) {
+            if (c == '"')
+                count++;
+        }
+        if(count == 2)
+            return true;
+        errorStr += "Statement should only have two \"\n";
+        return false;
+    }
+    inline bool isTokenArray(const std::string& token) {
+        unsigned int left = 0, right = 0;
+        if (token[0] != '[') return false;
+        for (char c : token) {
+            if (c == '[')
+                left++;
+            if (c == ']')
+                right++;
+        }
+        if (left != 1) {
+            errorStr = "Statement should have exactly one [";
+            return false;
+        }
+        if (right != 1) {
+            errorStr += "Statement should have exactly one ]";
+            return false;
+        }
+        return true;
+    }
+
+    inline ComponentObject createComponentInteger(const std::string& name, const std::string& value) {
         ComponentObject retValue = ComponentObject();
+        int num = atoi(value.c_str());
+        retValue.setInt((uint32_t)num);
+        retValue.name = name;
+        return retValue;
+    }
+    inline ComponentObject createComponentString(const std::string& name, const std::string& value) {
+        ComponentObject retValue = ComponentObject();
+        std::string cleanedValue = value;
+        removeCharsFromString(cleanedValue, "\"");
+        retValue.setString(cleanedValue.c_str());
+        retValue.name = name;
+        return retValue;
+    }
+    inline ComponentObject createComponentArray(const std::string& name, const std::string& value) {
+        ComponentObject retValue = ComponentObject();
+        std::string cleanedValue = value;
+        removeCharsFromString(cleanedValue, "[]");
+        std::vector<std::string> elements = split(cleanedValue, ",");
+        std::vector<uint32_t> values;
+        for (auto& element : elements) {
+            if (isTokenString(element)) {
+                Name nameElement = element;
+                values.push_back(nameElement.getID());
+                continue;
+            }
+            if (isDigits(element)) {
+                int num = atoi(element.c_str());
+                values.push_back((uint32_t)num);
+                continue;
+            }
+            errorStr += "Statement's array has an invalid element, elements may only be of type integer or string\n";
+            return retValue;
+        }
+        retValue.setArray(values);
+        retValue.name = name;
+        //uint32_t* arrayElement1 = (uint32_t*)retValue.data;
+        //uint32_t* arrayElement2 = arrayElement1 + 1;
+        return retValue;
+    }
+
+    inline ComponentObject createComponentObjectFromString(const std::string& str) {
+        errorStr = "";
+        //ComponentObject retValue = ComponentObject();
         std::vector<std::string> tokens = split(str, "=");
         //std::cout << tokens[0] << std::endl;
         //std::cout << tokens[1] << std::endl;
+
         if (tokens.size() != 2) {
+            errorStr += "Statement should have one = symbol\n";
+            return ComponentObject();
+        }
+        if (isTokenArray(tokens[1]))
+            return createComponentArray(tokens[0], tokens[1]);
+        if (isDigits(tokens[1]))
+            return createComponentInteger(tokens[0], tokens[1]);
+        if (isTokenString(tokens[1])) {
+            return createComponentString(tokens[0], tokens[1]);
+        }
+
+        errorStr += "Value is not of array, integer, or string type\n";
+        return ComponentObject();
+
+        /*if (tokens.size() != 2) {
             errorStr += "Statement should have one = symbol\n";
             return retValue;
         }
@@ -114,9 +206,9 @@ namespace EntityObjectLoader {
             retValue.setInt((uint32_t)num);
         }
         //throw;
-        return retValue;
+        return retValue;*/
     }
-    EntityObject createEntityObjectFromString(std::string str) {
+    inline EntityObject createEntityObjectFromString(std::string str) {
         cleanText(str);
         EntityObject retValue = EntityObject();
         size_t currentPos = 0;
@@ -133,7 +225,7 @@ namespace EntityObjectLoader {
         return retValue;
     }
 
-    EntityObject createEntityObjectFromFile(std::string filename) {
+    inline EntityObject createEntityObjectFromFile(std::string filename) {
         std::string line;
         std::ifstream myfile(filename);
         std::string fileText = "";

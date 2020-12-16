@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <DDECS.h>
+#include <Name.h>
 
 /*namespace EntityObject {
 	struct ComponentObject {
@@ -17,8 +18,8 @@
 }*/
 
 struct ComponentObject {
-	std::string name = "";
 	void* data = NULL;
+	std::string name = "";
 	void destruct() {
 		size = 0;
 		//name = "";
@@ -28,7 +29,7 @@ struct ComponentObject {
 		TYPE_NULL,
 		TYPE_INT,
 		TYPE_STRING,
-		TYPE_ARRAY_INT//,
+		TYPE_ARRAY//,
 		//TYPE_OBJECT
 	} type = TYPE::TYPE_NULL;
 	size_t size = 0;
@@ -45,7 +46,7 @@ struct ComponentObject {
 		memcpy(data, &value, sizeof(uint32_t));
 	}
 	void setString(const char* value) {
-		destruct();
+		/*destruct();
 		type = TYPE::TYPE_STRING;
 		size = strlen(value);
 		if (size > 256) throw;
@@ -54,11 +55,17 @@ struct ComponentObject {
 		for (size_t i = 0; i < size; i++)
 			((char*)data)[i] = value[i];
 		#pragma warning(suppress: 6386)
-		((char*)data)[size] = 0;
-	}
-	void setArrayInt(const std::vector<uint32_t> value) {
+		((char*)data)[size] = 0;*/
 		destruct();
-		type = TYPE::TYPE_ARRAY_INT;
+		type = TYPE::TYPE_STRING;
+		size = sizeof(Name);
+		Name nameValue = value;
+		static_assert(sizeof(Name) <= sizeof(void*), "Size of Name is greater than size of void*");
+		memcpy(&data, &nameValue, sizeof(Name));
+	}
+	void setArray(const std::vector<uint32_t> value) {
+		destruct();
+		type = TYPE::TYPE_ARRAY;
 		size = value.size() * sizeof(uint32_t);
 		data = malloc(size);
 		if (data == NULL) throw;
@@ -68,10 +75,12 @@ struct ComponentObject {
 	uint32_t getInt() {
 		return *(uint32_t*)data;
 	}
-	const char* getString() {
-		return (char*)data;
+	Name getString() {
+		Name retValue = "";
+		memcpy(&retValue, &data, sizeof(Name));
+		return retValue;
 	}
-	uint32_t* getArrayInt() {
+	uint32_t* getArray() {
 		return (uint32_t*)data;
 	}
 	uint32_t getArrayIntLen() {
@@ -86,5 +95,6 @@ struct EntityObject {
 				return &c;
 		return nullptr;
 	}
+	void* getComponentData(const std::string);
 };
 

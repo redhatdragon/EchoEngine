@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <vector>
 #include <string>
-#include <FlatBuffer.h>
+#include "FlatBuffer.h"
 
 typedef uint32_t EntityID;
 typedef uint32_t ComponentID;
@@ -12,11 +12,7 @@ class DDECS {
 	struct Entity {
 		FlatFlaggedBuffer<uint32_t, max_components> componentIndexes;
 		void clear() {
-			memset(this, 0, sizeof(*this));  //Might not be working.
-			/*auto count = componentIndexes.getCount();
-			for(auto i = 0, found = 0; found < count; i++) {
-				if (componentIndexes.getIsValid(i));
-			}*/
+			memset(this, 0, sizeof(*this));
 		}
 	};
 	FlatFlaggedBuffer<Entity, max_entities> entities;
@@ -47,25 +43,21 @@ class DDECS {
 			memcpy(&data[index * componentSize], &data[count * componentSize], componentSize);
 			owner[index] = owner[count];
 			//TODO: This needs rework not sure how though.
-			return owner[count];
-			owner[count] = -1;
+			EntityID retValue = owner[count];
+			owner[count] = -1;  //TODO: should be safe to remove without any consequence.
+			//return owner[count];
+			return retValue;
 		}
 	};
 	FlatBuffer<ComponentBuffer, max_components> components;
 public:
 	DDECS() {
-		/*for (unsigned int i = 0; i < max_entities; i++) {
-			for (unsigned int j = 0; j < max_components; j++) {
-				entities[i].componentIndexes[j] = -1;
-			}
-		}*/
 		for (unsigned int i = 0; i < max_entities; i++) {
 			entities[i].clear();
 		}
 	}
 	EntityID getNewEntity() {
 		entities.incrementCount();
-		//entities[entities.getCount() - 1].clear();
 		return entities.toggleFirstInvalid();
 	}
 	void removeEntity(EntityID entity) {
@@ -74,28 +66,26 @@ public:
 		uint32_t i = 0, foundCount = 0;
 		while (foundCount < compCount) {
 			if (compIndexes.getIsValid(i)) {
-				//auto index = compIndexes[i];
-				//Entity& otherEntity = entities[components[i].remove(index)];
 				removeComponent(entity, i);
-
-				//compIndexes.setInvalid(i);
 				foundCount++;
 			}
 			i++;
 		}
-		//compIndexes.clear();
 		entities[entity].clear();
 		entities.decrementCount();
 		entities.setInvalid(entity);
-		//memcpy(&entities[entity], &entities[entities.getCount()], sizeof(entities[entity]));
-		//memcpy(&entities[entity], &entities[entities.getCount()], sizeof(Entity));
-		//entities[entity] = entities[entities.getCount()];
 	}
-	ComponentID registerComponent(const std::string& componentName, uint32_t size) {
+	ComponentID registerComponentUnsafe(const std::string& componentName, uint32_t size) {
 		ComponentID retValue = { components.count };
 		ComponentBuffer *buffer = &components[components.count];
 		buffer->init(componentName, size);
 		components.count++;
+		return retValue;
+	}
+	ComponentID registerComponent(const std::string& componentName, uint32_t size) {
+		ComponentID retValue = getComponentID(componentName);
+		if (retValue == -1)
+			return registerComponentUnsafe(componentName, size);
 		return retValue;
 	}
 	ComponentID getComponentID(const std::string& componentName) {
@@ -106,11 +96,6 @@ public:
 		}
 		return { (uint32_t)-1 };
 	}
-	/*ComponentID getOrRegisterComponentID(const std::string& componentName) {
-		ComponentID retValue = getComponentID(componentName);
-		if (retValue == -1) 
-			return registerComponent()
-	}*/
 	void emplace(EntityID entity, ComponentID componentID, void* data) {
 		ComponentBuffer* buffer = &components[componentID];
 		buffer->push(data, entity);
@@ -123,8 +108,7 @@ public:
 		auto index = entities[entity].componentIndexes[componentID];
 		EntityID otherEntity = components[componentID].remove(index);
 		entities[entity].componentIndexes.setInvalid(componentID);
-		//TODO: Weird complicated bit should rethink probably.
-		//entities[otherEntity].componentIndexes[componentID] = components[componentID].getCount() - 1;
+		entities[entity].componentIndexes.decrementCount();
 		entities[otherEntity].componentIndexes[componentID] = index;
 	}
 	void* getComponentBuffer(ComponentID componentID) {
@@ -140,12 +124,19 @@ public:
 		uint32_t componentIndex = entities[entity].componentIndexes[componentID];
 		if (entities[entity].componentIndexes.getIsValid(componentID) == false)
 			return nullptr;
-		//uint8_t* data = &components[componentID].data[componentIndex*components[componentID].owner.count];
 		ComponentBuffer* buffer = &components[componentID];
 		uint8_t* data = (uint8_t*)buffer->getData();
-		//data += componentIndex*buffer->getCount();
 		data += componentIndex * buffer->getComponentSize();
 		return (void*)data;
+	}
+	template<typename T>
+	T getEntityComponentAs(EntityID entity, ComponentID componentID) {
+		void* retValue = getEntityComponent(entity, componentID);
+		return *(T*)retValue;
+	}
+	bool entityHasComponent(EntityID entity, ComponentID componentID) {
+		if (getEntityComponent(entity, componentID)) return true;
+		return false;
 	}
 	uint32_t getEntityCount() {
 		return entities.getCount();
