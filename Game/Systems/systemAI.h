@@ -1,3 +1,6 @@
 #pragma once
 
-void systemAI();
+class SystemAI : public System {
+public:
+	virtual void run();
+} static systemAI;

@@ -1,3 +1,6 @@
 #pragma once
 
-void systemDisplay();
+class SystemDisplay : public System {
+public:
+	virtual void run();
+} static systemDisplay;

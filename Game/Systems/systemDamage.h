@@ -1,3 +1,6 @@
 #pragma once
 
-void systemDamage();
+class SystemDamage : public System {
+public:
+	virtual void run();
+} static systemDamage;

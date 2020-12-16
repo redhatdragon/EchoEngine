@@ -32,6 +32,7 @@ struct SDL_Renderer *renderer;
 const Uint8* keys;
 
 float FPS;
+float FPSLimit = 30;
 
 void drawTexture(const void* texture, int x, int y, int w, int h) {
 	struct SDL_Texture* t = texture;
@@ -50,9 +51,16 @@ void releaseTexture(void* texture) {
 	SDL_DestroyTexture(texture);
 }
 void drawText(const char* str, int x, int y, unsigned int fontWidth) {
-	TTF_Font* font = TTF_OpenFont(DIR_TO_DATA "fonts/consola.ttf", fontWidth);
-	if (font == NULL)
-		printf("Error: Can't load font arial.ttf.\n");
+	static unsigned int lastFontWidth = 0;
+	static TTF_Font* font = NULL;
+	if (fontWidth == 0) return;
+	if (fontWidth != lastFontWidth) {
+		if (font) TTF_CloseFont(font);
+		font = TTF_OpenFont(DIR_TO_DATA "fonts/consola.ttf", fontWidth);
+		if (font == NULL)
+			printf("Error: Can't load font arial.ttf.\n");
+		lastFontWidth = fontWidth;
+	}
 
 	SDL_Color color = { 255, 255, 255 };
 	SDL_Surface* surface = TTF_RenderText_Solid(font, str, color);
@@ -65,8 +73,6 @@ void drawText(const char* str, int x, int y, unsigned int fontWidth) {
 
 	SDL_DestroyTexture(texture);
 	SDL_FreeSurface(surface);
-
-	TTF_CloseFont(font);
 }
 void drawRect(int x, int y, int w, int h, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
 	//SDL_Color color = { 255, 255, 255 };
@@ -118,7 +124,7 @@ float getFPS() {
 	return FPS;
 }
 void setFPS(uint32_t fps) {
-
+	FPSLimit = fps;
 }
 
 int main(int argc, char *argv[]) {
@@ -155,7 +161,8 @@ int main(int argc, char *argv[]) {
 		appLoop();
 
 		SDL_RenderPresent(renderer);
-		const uint32_t mili_per_frame = 16*2;
+		//const uint32_t mili_per_frame = 16*2;
+		uint32_t mili_per_frame = (1.f / FPSLimit)*1000;
 		clock_t endTime = clock();
 		clock_t differentialTime = endTime - startTime;
 		if (differentialTime < mili_per_frame) {

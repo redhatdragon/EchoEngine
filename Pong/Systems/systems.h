@@ -21,6 +21,19 @@ extern ComponentID suicideOnCollisionComponentID;
 
 void registerComponents();
 
+class System {
+protected:
+	clock_t ms = 0;  //must be updated in every run method
+public:
+	virtual void run() = 0;
+	clock_t getTimeMS() {
+		return ms;
+	}
+	std::string getTimeMSStr() {
+		std::to_string((int)ms);
+	}
+};
+
 #include "systemDisplay.h"
 
 #include "systemPlayer.h"

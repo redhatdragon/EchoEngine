@@ -1,16 +1,16 @@
 #include "systems.h"
 #include "systemDisplay.h"
 
-void systemDisplay() {
+void SystemDisplay::run() {
 	clock_t c = clock();
 	auto bodyComponentID = ecs.getComponentID("body");
 	Vec2D<uint32_t> displayOffset = { 0, 0 };
+	unsigned int canvasWidth, canvasHeight;
+	getCanvasSize(&canvasWidth, &canvasHeight);
 	{  //Get camera offset
 		int mx, my;
-		unsigned int cx, cy;
 		getMouseCanvasPos(&mx, &my);
-		getCanvasSize(&cx, &cy);
-		if (mx < 0 || mx > (int)cx || my < 0 || my > (int)cy)
+		if (mx < 0 || mx > (int)canvasWidth || my < 0 || my > (int)canvasHeight)
 			return;  //May be redundant.
 		//ComponentID playerControllerComponentID = ecs.getComponentID("playerController");
 		if (playerControllerComponentID != -1) {
@@ -18,7 +18,7 @@ void systemDisplay() {
 			BodyID* body = (BodyID*)ecs.getEntityComponent(player1, bodyComponentID);
 			if (body != NULL) {
 				auto playerPos = physics.getPos<int32_t>(*body);
-				displayOffset.x += playerPos.x - cx / 2; displayOffset.y += playerPos.y - cy / 2;
+				displayOffset.x += playerPos.x - canvasWidth / 2; displayOffset.y += playerPos.y - canvasHeight / 2;
 				displayOffset.x *= -1; displayOffset.y *= -1;
 			}
 		}
@@ -35,20 +35,11 @@ void systemDisplay() {
 		if (texID == NULL)
 			continue;
 		auto tex = TextureCodex::get(*texID);
+		//if(pos.x+siz.x < displayOffset.x || pos.x > displayOffset.x + canvasWidth
+		//|| pos.y+siz.y < displayOffset.y || pos.y > displayOffset.y + canvasHeight)
+			//continue;
 		drawTexture(tex, pos.x + displayOffset.x, pos.y + displayOffset.y, siz.x, siz.y);
 	}
-	const char* ms = "ms";
-	std::string entityCount = "Entities: ";
-	entityCount += std::to_string((int)ecs.getEntityCount());
-	std::string physicsTime = "Physics: ";
-	physicsTime += std::to_string((int)physics.getTime()); physicsTime += ms;
-	std::string displayTime = "systemDisplay: ";
-	displayTime += std::to_string((int)(clock() - c)); displayTime += ms;
-	drawText(entityCount.c_str(), 16, 0, 12);
-	drawText(physicsTime.c_str(), 16, 16, 12);
-	drawText(displayTime.c_str(), 16, 32, 12);
-	drawText(std::to_string(getFPS()).c_str(), 700, 0, 12);
-
-	//if (getKeyState('f'))
-		//throw;
+	
+	ms = clock() - c;
 }

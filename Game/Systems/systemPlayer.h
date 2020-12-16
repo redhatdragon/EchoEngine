@@ -1,3 +1,6 @@
 #pragma once
 
-void systemPlayer();
+class SystemPlayer : public System {
+public:
+	virtual void run();
+} static systemPlayer;

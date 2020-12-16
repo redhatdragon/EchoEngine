@@ -57,7 +57,7 @@ void appStart() {
 void appLoop() {
 	physics.tick();
 	systemDisplay();
-	systemPlayer();
+	systemPlayer.run();
 	systemDamage();
 	systemDead();
 }

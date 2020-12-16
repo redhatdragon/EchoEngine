@@ -1,7 +1,8 @@
 #include "systems.h"
 #include "systemDamage.h"
 
-void systemDamage() {
+void SystemDamage::run() {
+	clock_t c = clock();
 	if (detectOverlapComponentID == -1 || damageOnCollisionComponentID == -1 || healthComponentID == -1) return;
 	auto damageOnCollisionCount = ecs.getComponentCount(damageOnCollisionComponentID);
 	for (uint32_t i = 0; i < damageOnCollisionCount; i++) {
@@ -24,4 +25,5 @@ void systemDamage() {
 			*health -= *damage;
 		}
 	}
+	ms = clock() - c;
 }

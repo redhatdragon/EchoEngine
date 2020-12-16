@@ -56,11 +56,11 @@ void appStart() {
     ComponentObject* size = player.getComponent("size");
     ComponentObject* texture = player.getComponent("texture");
     ComponentObject* health = player.getComponent("health");
-    uint32_t* arr = size->getArrayInt();
+    uint32_t* arr = size->getArray();
     for (uint32_t i = 0; i < size->getArrayIntLen(); i++)
         std::cout << arr[i] << ' ';
     std::cout << std::endl;
-    std::cout << texture->getString() << std::endl;
+    std::cout << texture->getString().c_str() << std::endl;
     std::cout << health->getInt() << std::endl;
 
     button = Widget::createNew(64, 64, 64, 64);

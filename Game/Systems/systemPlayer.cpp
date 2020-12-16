@@ -1,7 +1,8 @@
 #include "systems.h"
 #include "systemPlayer.h"
 
-void systemPlayer() {
+void SystemPlayer::run() {
+	clock_t c = clock();
 	static uint64_t shootingDelay = 100;
 	auto playerControllerCount = ecs.getComponentCount(playerControllerComponentID);
 	for (uint32_t i = 0; i < playerControllerCount; i++) {
@@ -44,7 +45,7 @@ void systemPlayer() {
 			auto velocity = direction * 17;
 
 			EntityID bullet = ecs.getNewEntity();
-			TextureID textureID = TextureCodex::add(std::string(getDirData()) + "textures/Bullet.png");
+			TextureID textureID = TextureCodex::add("data/textures/Bullet.png");
 			ecs.emplace(bullet, textureComponentID, &textureID);
 			BodyID bodyID = physics.addBodyRect(spawnPos.x, spawnPos.y, 8, 8);
 			physics.setVelocity(bodyID, velocity.x, velocity.y);
@@ -58,4 +59,5 @@ void systemPlayer() {
 		}
 	}
 	shootingDelay++;
+	ms = clock()-c;
 }

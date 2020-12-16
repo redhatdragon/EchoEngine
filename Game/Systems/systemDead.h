@@ -1,3 +1,6 @@
 #pragma once
 
-void systemDead();
+class SystemDead : public System {
+public:
+	virtual void run();
+} static systemDead;

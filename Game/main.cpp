@@ -23,6 +23,8 @@ void appStart() {
 	std::cout << "Pre initialization finished in " << c << " miliseconds." << std::endl;
 	std::cout << "Initializing app...    ";
 
+	setFPS(120);
+
 	physics.init();
 
 	//threadPool = ThreadPoolCreate(8);
@@ -58,11 +60,36 @@ void appStart() {
 	std::cout << "Done!  \nInitialized in " << c << " miliseconds." << std::endl;
 }
 void appLoop() {
+	clock_t c = clock();
 	physics.tick();
-	systemDisplay();
-	systemPlayer();
-	systemDamage();
-	systemDead();
+	const char* ms = "ms";
+	std::string entityCount = "Entities: ";
+	entityCount += std::to_string((int)ecs.getEntityCount());
+	std::string physicsTime = "Physics: ";
+	physicsTime += std::to_string((int)physics.getTime()); physicsTime += ms;
+	systemDisplay.run();
+	systemPlayer.run();
+	systemDamage.run();
+	systemDead.run();
+	std::string displayTime = "Display: ";
+	displayTime += systemDisplay.getTimeMSStr(); displayTime += ms;
+	std::string playerTime = "Player: ";
+	playerTime += systemDisplay.getTimeMSStr(); playerTime += ms;
+	std::string damageTime = "Damage: ";
+	damageTime += systemDisplay.getTimeMSStr(); damageTime += ms;
+	std::string deadTime = "Dead: ";
+	deadTime += systemDisplay.getTimeMSStr(); deadTime += ms;
+	std::string totalTime = "totalTime: ";
+	totalTime += std::to_string((int)(clock() - c)); totalTime += ms;
+	drawText(entityCount.c_str(), 16, 0, 12);
+	drawText(physicsTime.c_str(), 16, 16, 12);
+	drawText(displayTime.c_str(), 16, 32, 12);
+	drawText(playerTime.c_str(), 16, 48, 12);
+	drawText(damageTime.c_str(), 16, 64, 12);
+	drawText(deadTime.c_str(), 16, 80, 12);
+	drawText(totalTime.c_str(), 16, 96, 12);
+
+	drawText(std::to_string(getFPS()).c_str(), 700, 0, 12);
 }
 void appEnd() {
 	//ThreadPoolDestroy(threadPool);

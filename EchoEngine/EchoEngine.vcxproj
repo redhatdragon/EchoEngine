@@ -170,12 +170,13 @@
   <ItemGroup>
     <ClInclude Include="Asset.h" />
     <ClInclude Include="Data.h" />
-    <ClInclude Include="EntityObject.h" />
-    <ClInclude Include="EntityObjectLoader.h" />
     <ClInclude Include="include\DDECS.h" />
+    <ClInclude Include="include\EntityObject.h" />
+    <ClInclude Include="include\EntityObjectLoader.h" />
     <ClInclude Include="include\FlatBuffer.h" />
     <ClInclude Include="include\IO_API\ExampleImplimentations\SDL2\IO_API_SDL2.h" />
     <ClInclude Include="include\IO_API\ExampleImplimentations\SDL2\ThreadPool.h" />
+    <ClInclude Include="include\Name.h" />
     <ClInclude Include="include\SS.h" />
     <ClInclude Include="include\PhysicsEngine.h" />
     <ClInclude Include="include\PhysicsEngineConvex.h" />
@@ -187,6 +188,7 @@
   <ItemGroup>
     <ClCompile Include="Asset.cpp" />
     <ClCompile Include="include\IO_API\IO_API.c" />
+    <ClCompile Include="include\Name.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Widget.cpp" />
   </ItemGroup>

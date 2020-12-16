@@ -1,7 +1,8 @@
 #include "systems.h"
 #include "systemPlayer.h"
 
-void systemPlayer() {
+void SystemPlayer::run() {
+	clock_t c = clock();
 	static uint64_t shootingDelay = 100;
 	auto playerControllerCount = ecs.getComponentCount(playerControllerComponentID);
 	for (uint32_t i = 0; i < playerControllerCount; i++) {
@@ -58,4 +59,5 @@ void systemPlayer() {
 		}
 	}
 	shootingDelay++;
+	ms = clock()-c;
 }
