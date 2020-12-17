@@ -116,6 +116,27 @@ void getCanvasSize(unsigned int* width, unsigned int* height) {
 	*width = 1024; *height = 768;
 }
 
+bool getFileText(const char* fileName, char* strBuffer) {
+	FILE* t = fopen(fileName, "r");
+	if (t == NULL) return false;
+	char c;
+	size_t i = 0;
+	while ((c = getc(t)) != EOF) {
+		strBuffer[i] = c;
+		i++;
+	}
+	fclose(t);
+	return true;
+}
+uint32_t fileGetSize(const char* fileName) {
+	FILE* t = fopen(fileName, "r");
+	if (t == NULL) return 0;
+	fseek(t, 0L, SEEK_END);
+	uint32_t retValue = ftell(t);
+	fseek(t, 0L, SEEK_SET);
+	fclose(t);
+	return retValue;
+}
 const char* getDirData() {
 	return DIR_TO_DATA;
 }

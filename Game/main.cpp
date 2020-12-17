@@ -2,6 +2,7 @@
 #include <DDECS.h>
 #include <PhysicsEngine.h>
 //#include "PhysicsEngineConvex.h"
+#include <EntityObjectLoader.h>
 #include "Asset.h"
 #include <iostream>
 #include <time.h>
@@ -15,6 +16,45 @@ void foo(void*) {
 
 }
 
+void spawnEntity(const char* fileName, uint32_t x, uint32_t y) {
+	std::string fullPath = getDirData();
+	fullPath += fileName;
+	EntityObject entityObject = EntityObjectLoader::createEntityObjectFromFile(fullPath);
+	EntityID entity = ecs.getNewEntity();
+	for (ComponentObject& component : entityObject.components) {
+		std::string name = component.name;
+		uint32_t size = component.size;
+		if (name == "size") {
+			uint32_t* data = component.getArray();
+			BodyID bodyID = physics.addBodyRect(x, y, data[0], data[1]);
+			physics.setUserData(bodyID, (void*)entity);
+			ecs.emplace(entity, bodyComponentID, &bodyID);
+			continue;
+		}
+		if (name == "texture") {
+			Name textureName = component.getString();
+			std::string textureStr = getDirData(); textureStr += component.getString().c_str();
+			TextureID tex = TextureCodex::add(textureStr);
+			ecs.emplace(entity, textureComponentID, &tex);
+			continue;
+		}
+		if (size > sizeof(uint32_t)) {
+			void* data = component.getArray();
+			ComponentID componentID = ecs.registerComponent(name, size);
+			ecs.emplace(entity, componentID, data);
+			continue;
+		}
+		if (size == 0) {
+			ComponentID componentID = ecs.registerComponent(name, size);
+			ecs.emplace(entity, componentID, NULL);
+			continue;
+		}
+		uint32_t data = component.getInt();
+		ComponentID componentID = ecs.registerComponent(name, size);
+		ecs.emplace(entity, componentID, &data);
+	}
+}
+
 void appStart() {
 	srand(time(NULL));
 
@@ -23,7 +63,7 @@ void appStart() {
 	std::cout << "Pre initialization finished in " << c << " miliseconds." << std::endl;
 	std::cout << "Initializing app...    ";
 
-	setFPS(120);
+	setFPS(60);
 
 	physics.init();
 
@@ -31,12 +71,13 @@ void appStart() {
 	//ThreadPoolGiveTask(threadPool, foo, NULL);
 
 	registerComponents();
+	systemAI.init();
 
 
 	EntityID player = ecs.getNewEntity();
 	BodyID bodyID = physics.addBodyRect(128, 128, 16, 16);
 	physics.setUserData(bodyID, (void*)player);
-	TextureID koiTexID = TextureCodex::add(std::string(getDirData())+"textures/Koishi.png");
+	TextureID koiTexID = TextureCodex::add(std::string(getDirData())+"Textures/Koishi.png");
 	ecs.emplace(player, bodyComponentID, &bodyID);
 	ecs.emplace(player, playerControllerComponentID, NULL);
 	ecs.emplace(player, textureComponentID, &koiTexID);
@@ -45,16 +86,17 @@ void appStart() {
 	ecs.emplace(player, healthComponentID, &health);
 	//ecs.emplace(player, suicideOnCollisionComponentID, NULL);
 
-	for(auto i = 0; i < 40000; i++)
+	for(auto i = 0; i < 1; i++)
 		for (auto j = 0; j < 1; j++) {
-			EntityID npc = ecs.getNewEntity();
+			/*EntityID npc = ecs.getNewEntity();
 			BodyID bodyID = physics.addBodyRect(i*96, j*96, 64, 64);
 			physics.addVelocity(bodyID, 2*i%3, 2*i%5);
 			physics.setUserData(bodyID, (void*)npc);
 			ecs.emplace(npc, bodyComponentID, &bodyID);
 			ecs.emplace(npc, textureComponentID, &koiTexID);
 			ecs.emplace(npc, healthComponentID, &health);
-			ecs.emplace(npc, detectOverlapComponentID, NULL);
+			ecs.emplace(npc, detectOverlapComponentID, NULL);*/
+			spawnEntity("Entities/Drone.txt", i * 96, j * 96);
 		}
 	c = clock()-c;
 	std::cout << "Done!  \nInitialized in " << c << " miliseconds." << std::endl;
@@ -71,6 +113,7 @@ void appLoop() {
 	systemPlayer.run();
 	systemDamage.run();
 	systemDead.run();
+	systemAI.run();
 	std::string displayTime = "Display: ";
 	displayTime += systemDisplay.getTimeMSStr(); displayTime += ms;
 	std::string playerTime = "Player: ";
@@ -79,6 +122,8 @@ void appLoop() {
 	damageTime += systemDisplay.getTimeMSStr(); damageTime += ms;
 	std::string deadTime = "Dead: ";
 	deadTime += systemDisplay.getTimeMSStr(); deadTime += ms;
+	std::string AITime = "AI: ";
+	AITime += systemDisplay.getTimeMSStr(); AITime += ms;
 	std::string totalTime = "totalTime: ";
 	totalTime += std::to_string((int)(clock() - c)); totalTime += ms;
 	drawText(entityCount.c_str(), 16, 0, 12);

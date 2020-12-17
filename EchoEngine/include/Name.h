@@ -6,30 +6,25 @@ class Name {
 	static std::vector<std::string> strings;
 	uint32_t id = 0;
 public:
-	Name(Name& other) {
-		id = other.id;
-	}
 	Name(std::string& str) {
-		uint32_t newID;
 		if (map.find(str) == map.end()) {
-			newID = strings.size();
+			uint32_t newID = strings.size();
 			map[str] = newID;
 			strings.push_back(str);
 			id = newID;
 			return;
 		}
-		newID = map[str];
+		id = map[str];
 	}
 	Name(const char* str) {
-		uint32_t newID;
 		if (map.find(str) == map.end()) {
-			newID = strings.size();
+			uint32_t newID = strings.size();
 			map[str] = newID;
 			strings.push_back(str);
 			id = newID;
 			return;
 		}
-		newID = map[str];
+		id = map[str];
 	}
 	inline const char* c_str() {
 		return strings[id].c_str();

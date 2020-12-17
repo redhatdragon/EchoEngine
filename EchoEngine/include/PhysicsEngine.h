@@ -48,6 +48,9 @@ struct Vec2D {
 	__forceinline double getDistance() {
 		return sqrt(x * x + y * y);
 	}
+	__forceinline double getDistanceFrom(Vec2D& other) {
+		return (*this-other).getDistance();
+	}
 };
 
 struct BodyAABB {
@@ -111,7 +114,7 @@ public:
 				return true;
 		return false;
 	}
-	std::vector< FlatBuffer<BodyID, max_bodies_per_hash>*> getHashes(Vec2D<int32_t>& pos, Vec2D<int32_t>& siz) {
+	__forceinline std::vector< FlatBuffer<BodyID, max_bodies_per_hash>*> getHashes(Vec2D<int32_t>& pos, Vec2D<int32_t>& siz) {
 		std::vector< FlatBuffer<BodyID, max_bodies_per_hash>*> returnValue;
 		uint32_t startRight = pos.x / hashWidth, startDown = pos.y / hashWidth;
 		uint32_t endRight = (pos.x + siz.x) / hashWidth, endDown = (pos.y + siz.y) / hashWidth;
@@ -185,6 +188,22 @@ public:
 
 	FlatBuffer<BodyID, 100>& getOverlappingBodies(BodyID id) {
 		return overlappingBodyIDs[id.id];
+	}
+
+	inline std::vector<BodyID> getBodiesInRectRough(Vec2D<int32_t> &pos, Vec2D<int32_t> &siz) {
+		std::vector<BodyID> retValue;
+
+		
+		auto hashes = spatialHashTable.getHashes(pos, siz);
+		for (auto* hash : hashes) {
+			uint32_t hashSize = hash->count;
+			for (uint32_t i = 0; i < hashSize; i++) {
+				BodyID bodyID = (*hash)[i];
+				retValue.push_back(bodyID);
+			}
+		}
+
+		return retValue;
 	}
 
 	void addVelocity(BodyID id, float vx, float vy) {

@@ -23,7 +23,8 @@ struct ComponentObject {
 	void destruct() {
 		size = 0;
 		//name = "";
-		free(data);
+		if (type == TYPE::TYPE_ARRAY)
+			free(data);
 	}
 	enum class TYPE : uint8_t {
 		TYPE_NULL,
@@ -33,7 +34,7 @@ struct ComponentObject {
 		//TYPE_OBJECT
 	} type = TYPE::TYPE_NULL;
 	size_t size = 0;
-	void setNull() {
+	void setNULL() {
 		destruct();
 		type = TYPE::TYPE_NULL;
 	}
@@ -41,9 +42,7 @@ struct ComponentObject {
 		destruct();
 		type = TYPE::TYPE_INT;
 		size = sizeof(uint32_t);
-		data = malloc(sizeof(uint32_t));
-		if (data == NULL) throw;
-		memcpy(data, &value, sizeof(uint32_t));
+		memcpy(&data, &value, sizeof(uint32_t));
 	}
 	void setString(const char* value) {
 		/*destruct();
@@ -73,7 +72,7 @@ struct ComponentObject {
 	}
 
 	uint32_t getInt() {
-		return *(uint32_t*)data;
+		return (uint32_t)(intptr_t)data;
 	}
 	Name getString() {
 		Name retValue = "";

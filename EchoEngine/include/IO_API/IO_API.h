@@ -75,12 +75,11 @@ extern "C" {
 	//void setWindowSize(unsigned int width, unsigned int height);
 	void getCanvasSize(unsigned int* width, unsigned int* height);
 
-	bool getFileData(const char* fileName, uint8_t* dataBuffer, uint32_t startPos, uint32_t numBytes);
+	bool getFileData(const char* fileName, uint8_t* dataBuffer);
 	bool getFileText(const char* fileName, char* strBuffer);
 	bool writeFileData(const char* fileName, uint8_t* data);
 	bool writeFileText(const char* fileName, char* str);
-	bool appendToFileData(const char* fileName, uint8_t* data);
-	bool appendToFileText(const char* fileName, char* str);
+	uint32_t fileGetSize(const char* fileName);
 	const char* getDirData();
 
 	float getFPS();

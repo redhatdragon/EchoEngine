@@ -1,0 +1,8 @@
+#Reserved components for the level editor
+size = [64, 64];
+texture = "Textures/Koishi.png";
+
+#User defined components for the game
+detectOverlap = NULL;
+health = 100;
+getAIFromFile = "AI/AIDrone.txt";

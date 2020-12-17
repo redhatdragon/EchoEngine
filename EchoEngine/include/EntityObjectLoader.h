@@ -102,6 +102,11 @@ namespace EntityObjectLoader {
         }
         return true;
     }
+    inline bool isTokenNULL(const std::string& token) {
+        if (token == "NULL")
+            return true;
+        return false;
+    }
 
     inline ComponentObject createComponentInteger(const std::string& name, const std::string& value) {
         ComponentObject retValue = ComponentObject();
@@ -144,6 +149,12 @@ namespace EntityObjectLoader {
         //uint32_t* arrayElement2 = arrayElement1 + 1;
         return retValue;
     }
+    inline ComponentObject createComponentNULL(std::string& name) {
+        ComponentObject retValue = ComponentObject();
+        retValue.setNULL();
+        retValue.name = name;
+        return retValue;
+    }
 
     inline ComponentObject createComponentObjectFromString(const std::string& str) {
         errorStr = "";
@@ -160,11 +171,12 @@ namespace EntityObjectLoader {
             return createComponentArray(tokens[0], tokens[1]);
         if (isDigits(tokens[1]))
             return createComponentInteger(tokens[0], tokens[1]);
-        if (isTokenString(tokens[1])) {
+        if (isTokenString(tokens[1]))
             return createComponentString(tokens[0], tokens[1]);
-        }
+        if (isTokenNULL(tokens[1]))
+            return createComponentNULL(tokens[0]);
 
-        errorStr += "Value is not of array, integer, or string type\n";
+        errorStr += "Value is not of array, integer, string, or NULL type\n";
         return ComponentObject();
 
         /*if (tokens.size() != 2) {
@@ -225,7 +237,7 @@ namespace EntityObjectLoader {
         return retValue;
     }
 
-    inline EntityObject createEntityObjectFromFile(std::string filename) {
+    inline EntityObject createEntityObjectFromFile(std::string &filename) {
         std::string line;
         std::ifstream myfile(filename);
         std::string fileText = "";
