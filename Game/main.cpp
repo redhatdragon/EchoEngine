@@ -16,7 +16,7 @@ void foo(void*) {
 
 }
 
-void spawnEntity(const char* fileName, uint32_t x, uint32_t y) {
+void spawnEntity(const char* fileName, uint32_t x, uint32_t y, uint32_t vx = 0, uint32_t vy = 0) {
 	std::string fullPath = getDirData();
 	fullPath += fileName;
 	EntityObject entityObject = EntityObjectLoader::createEntityObjectFromFile(fullPath);
@@ -28,6 +28,7 @@ void spawnEntity(const char* fileName, uint32_t x, uint32_t y) {
 			uint32_t* data = component.getArray();
 			BodyID bodyID = physics.addBodyRect(x, y, data[0], data[1]);
 			physics.setUserData(bodyID, (void*)entity);
+			physics.addVelocity(bodyID, vx, vy);
 			ecs.emplace(entity, bodyComponentID, &bodyID);
 			continue;
 		}
@@ -84,9 +85,11 @@ void appStart() {
 	ecs.emplace(player, detectOverlapComponentID, NULL);
 	uint32_t health = 100;
 	ecs.emplace(player, healthComponentID, &health);
-	//ecs.emplace(player, suicideOnCollisionComponentID, NULL);
+	ComponentID teamComponentID = ecs.registerComponent("team", sizeof(uint32_t));
+	uint32_t team = 0;
+	ecs.emplace(player, teamComponentID, &team);
 
-	for(auto i = 0; i < 1; i++)
+	for(auto i = 0; i < 40000; i++)
 		for (auto j = 0; j < 1; j++) {
 			/*EntityID npc = ecs.getNewEntity();
 			BodyID bodyID = physics.addBodyRect(i*96, j*96, 64, 64);
@@ -96,7 +99,9 @@ void appStart() {
 			ecs.emplace(npc, textureComponentID, &koiTexID);
 			ecs.emplace(npc, healthComponentID, &health);
 			ecs.emplace(npc, detectOverlapComponentID, NULL);*/
-			spawnEntity("Entities/Drone.txt", i * 96, j * 96);
+			//uint32_t x = rand()%40000, y = rand()%40000;
+			spawnEntity("Entities/Drone.txt", i * 96, j * 96, 2*i%3, 2*i%5);
+			//spawnEntity("Entities/Drone.txt", x, y, 2 * i % 3, 2 * i % 5);
 		}
 	c = clock()-c;
 	std::cout << "Done!  \nInitialized in " << c << " miliseconds." << std::endl;
@@ -117,13 +122,13 @@ void appLoop() {
 	std::string displayTime = "Display: ";
 	displayTime += systemDisplay.getTimeMSStr(); displayTime += ms;
 	std::string playerTime = "Player: ";
-	playerTime += systemDisplay.getTimeMSStr(); playerTime += ms;
+	playerTime += systemPlayer.getTimeMSStr(); playerTime += ms;
 	std::string damageTime = "Damage: ";
-	damageTime += systemDisplay.getTimeMSStr(); damageTime += ms;
+	damageTime += systemDamage.getTimeMSStr(); damageTime += ms;
 	std::string deadTime = "Dead: ";
-	deadTime += systemDisplay.getTimeMSStr(); deadTime += ms;
+	deadTime += systemDead.getTimeMSStr(); deadTime += ms;
 	std::string AITime = "AI: ";
-	AITime += systemDisplay.getTimeMSStr(); AITime += ms;
+	AITime += systemAI.getTimeMSStr(); AITime += ms;
 	std::string totalTime = "totalTime: ";
 	totalTime += std::to_string((int)(clock() - c)); totalTime += ms;
 	drawText(entityCount.c_str(), 16, 0, 12);
@@ -132,7 +137,8 @@ void appLoop() {
 	drawText(playerTime.c_str(), 16, 48, 12);
 	drawText(damageTime.c_str(), 16, 64, 12);
 	drawText(deadTime.c_str(), 16, 80, 12);
-	drawText(totalTime.c_str(), 16, 96, 12);
+	drawText(AITime.c_str(), 16, 96, 12);
+	drawText(totalTime.c_str(), 16, 112, 12);
 
 	drawText(std::to_string(getFPS()).c_str(), 700, 0, 12);
 }

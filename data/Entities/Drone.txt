@@ -4,5 +4,6 @@ texture = "Textures/Koishi.png";
 
 #User defined components for the game
 detectOverlap = NULL;
-health = 100;
+health = 30;
 getAIFromFile = "AI/AIDrone.txt";
+team = 1;

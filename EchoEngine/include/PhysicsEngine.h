@@ -73,6 +73,11 @@ struct BodyAABB {
 
 struct BodyID {
 	uint32_t id;
+	bool operator==(BodyID other) {
+		if (id == other.id)
+			return true;
+		return false;
+	}
 };
 
 template<uint32_t width, uint32_t height, uint32_t hashWidth, uint32_t max_bodies_per_hash = 64>
@@ -191,6 +196,7 @@ public:
 	}
 
 	inline std::vector<BodyID> getBodiesInRectRough(Vec2D<int32_t> &pos, Vec2D<int32_t> &siz) {
+		pos *= unit_size; siz *= unit_size;
 		std::vector<BodyID> retValue;
 
 		
@@ -199,7 +205,12 @@ public:
 			uint32_t hashSize = hash->count;
 			for (uint32_t i = 0; i < hashSize; i++) {
 				BodyID bodyID = (*hash)[i];
+				for (auto e : retValue) {
+					if (e == (*hash)[i]) goto skip;
+				}
 				retValue.push_back(bodyID);
+				skip:
+				continue;
 			}
 		}
 

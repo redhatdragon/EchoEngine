@@ -80,17 +80,20 @@ void _initialize() {
 	}
 }
 
-inline std::vector<BodyID> _getEntitiesInRange(EntityID entity) {
-	std::vector<BodyID> bodiesToIgnore;
+inline std::vector<BodyID> _getOtherBodiesInRange(EntityID entity, std::vector<BodyID> bodiesToIgnore = std::vector<BodyID>()) {
+	if (ecs.entityHasComponent(entity, teamComponentID) == false)
+		return std::vector<BodyID>();
+
 	BodyID owningBody = ecs.getEntityComponentAs<BodyID>(entity, bodyComponentID);
 	bodiesToIgnore.push_back(owningBody);
 	Vec2D<int32_t> ownerPos = physics.getPos<int32_t>(owningBody);
-	std::vector<BodyID> bodiesInRange = physics.getBodiesInRectRough(ownerPos, Vec2D<int32_t>() = { 1000, 1000 });
+	std::vector<BodyID> bodiesInRange = physics.getBodiesInRectRough(ownerPos, Vec2D<int32_t>() = { 640, 640 });
 
-	for (int32_t j = 0; j < bodiesInRange.size(); j++) {
-		EntityID otherEntity = (EntityID)physics.getUserData(bodiesInRange[j]);
+	for (int32_t i = 0; i < bodiesInRange.size(); i++) {
+		EntityID otherEntity = (EntityID)physics.getUserData(bodiesInRange[i]);
 		if (ecs.entityHasComponent(otherEntity, teamComponentID) == false) goto removeElement;
 		{
+			if (ecs.entityHasComponent(otherEntity, teamComponentID) == false) goto removeElement;
 			uint32_t otherTeam = ecs.getEntityComponentAs<uint32_t>(otherEntity, teamComponentID);
 			uint32_t ownersTeam = ecs.getEntityComponentAs<uint32_t>(entity, teamComponentID);
 			if (otherTeam == ownersTeam) goto removeElement;
@@ -98,14 +101,24 @@ inline std::vector<BodyID> _getEntitiesInRange(EntityID entity) {
 		}
 
 		removeElement:
-		auto newSize = bodiesInRange.size() - 1;
-		bodiesInRange[j] = bodiesInRange[newSize];
-		bodiesInRange.pop_back();
+		bodiesToIgnore.push_back(bodiesInRange[i]);
 	}
+
+	for (auto bodyID : bodiesToIgnore) {
+		for (size_t i = 0; i < bodiesInRange.size(); i++) {
+			if (bodyID == bodiesInRange[i]) {
+				bodiesInRange[i] = bodiesInRange[bodiesInRange.size() - 1];
+				bodiesInRange.pop_back();
+			}
+		}
+	}
+	if (bodiesInRange.size() != 0)
+		;// throw;
 	return bodiesInRange;
 }
 
 void SystemAI::run() {
+	clock_t c = clock();
 	_initialize();
 
 	AI* bufferElement = (AI*)ecs.getComponentBuffer(AIComponentID);
@@ -117,10 +130,10 @@ void SystemAI::run() {
 		auto entity = ecs.getOwner(AIComponentID, i);
 		BodyID bodyID = ecs.getEntityComponentAs<BodyID>(entity, bodyComponentID);
 		Vec2D<int32_t> ownerPos = physics.getPos<int32_t>(bodyID);
-		uint32_t ownersTeam = -1;
-		if (ecs.entityHasComponent(entity, teamComponentID) == true)
-			ownersTeam = ecs.getEntityComponentAs<uint32_t>(entity, teamComponentID);
-		std::vector<BodyID> bodiesInRange = _getEntitiesInRange(entity);
+		//uint32_t ownersTeam = -1;
+		//if (ecs.entityHasComponent(entity, teamComponentID) == true)
+			//ownersTeam = ecs.getEntityComponentAs<uint32_t>(entity, teamComponentID);
+		std::vector<BodyID> bodiesInRange = _getOtherBodiesInRange(entity);
 		BodyID closestEnemy;
 		if (bodiesInRange.size() == 0) continue;
 		closestEnemy = bodiesInRange[0];
@@ -156,6 +169,7 @@ void SystemAI::run() {
 			bufferElement->values.retreat = dist * conditionalRating.rating;
 		}
 
+		//continue;
 		switch (bufferElement->values.getHighestValue()) {
 		case CONDITION_TYPES::CHASE_IF_IN_RANGE:
 			std::cout << "CHASE" << std::endl;
@@ -166,8 +180,12 @@ void SystemAI::run() {
 		case CONDITION_TYPES::RETREAT_IF_HEALTH_LESS_THAN:
 			std::cout << "RETREAT" << std::endl;
 			break;
+		default:
+			std::cout << bufferElement->values.getHighestValue() << std::endl;
+			break;
 		}
 
 		bufferElement++;
 	}
+	ms = clock() - c;
 }
