@@ -1,0 +1,14 @@
+a[]
+b[]
+*p
+
+*p starts out pointing to a[]
+Copy old buffer to new buffer and swap *p
+Simulate all bodies inside *p
+Detect all collisions inside *p
+Resolve all collisions using buffer not pointed to by *p
+
+
+A-B
+B-C
+C-A

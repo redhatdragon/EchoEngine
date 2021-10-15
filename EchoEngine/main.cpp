@@ -1,14 +1,16 @@
-/*#include <IO_API/IO_API.h>
+#include <IO_API/IO_API.h>
 #include <DDECS.h>
-#include <PhysicsEngine.h>
+#include <PhysicsEngineAABB2.h>
 //#include "PhysicsEngineConvex.h"
 #include "Asset.h"
 #include <iostream>
 #include <time.h>
 
-#include "systems/systems.h"
+//#include "Systems/systems.h"
 
 struct ThreadPool* threadPool;
+
+/*
 
 void foo(void*) {
 
@@ -22,7 +24,9 @@ void appStart() {
 
 	physics.init();
 
-	//threadPool = ThreadPoolCreate(8);
+	setFPS(600);
+
+	threadPool = ThreadPoolCreate(12);
 	//ThreadPoolGiveTask(threadPool, foo, NULL);
 
 	registerComponents();
@@ -31,7 +35,8 @@ void appStart() {
 	EntityID player = ecs.getNewEntity();
 	BodyID bodyID = physics.addBodyRect(128, 128, 16, 16);
 	physics.setUserData(bodyID, (void*)player);
-	TextureID koiTexID = TextureCodex::add("data/Textures/Koishi.png");
+	std::string dataDir = getDirData();
+	TextureID koiTexID = TextureCodex::add(dataDir+"Textures/Koishi.png");
 	ecs.emplace(player, bodyComponentID, &bodyID);
 	ecs.emplace(player, playerControllerComponentID, NULL);
 	ecs.emplace(player, textureComponentID, &koiTexID);
@@ -40,7 +45,7 @@ void appStart() {
 	ecs.emplace(player, healthComponentID, &health);
 	//ecs.emplace(player, suicideOnCollisionComponentID, NULL);
 
-	for(auto i = 0; i < 4000; i++) 
+	for(auto i = 0; i < 400; i++) 
 		for (auto j = 0; j < 1; j++) {
 			EntityID npc = ecs.getNewEntity();
 			BodyID bodyID = physics.addBodyRect(i*96, j*96, 64, 64);
@@ -56,11 +61,32 @@ void appStart() {
 }
 void appLoop() {
 	physics.tick();
-	systemDisplay();
-	systemPlayer();
-	systemDamage();
-	systemDead();
+	//systemAI.run();
+	systemDisplay.run();
+	systemPlayer.run();
+	systemDamage.run();
+	systemDead.run();
+	int x = 32, y = 16, s = 16, d = 8;
+	std::string str = "";
+	str = "FPS: "; str += std::to_string(getFPS());
+	drawText(str.c_str(), x, y, s); y += s + d;
+	str = "EntityCount: "; str += std::to_string(ecs.getEntityCount());
+	drawText(str.c_str(), x, y, s); y += s + d;
+	str = "Physics: "; str += std::to_string((int)physics.getTime());
+	drawText(str.c_str(), x, y, s); y += s + d;
+	str = "systemAI: "; str += systemAI.getTimeMSStr();
+	drawText(str.c_str(), x, y, s); y += s + d;
+	str = "systemDisplay: "; str += systemDisplay.getTimeMSStr();
+	drawText(str.c_str(), x, y, s); y += s + d;
+	str = "systemPlayer: "; str += systemPlayer.getTimeMSStr();
+	drawText(str.c_str(), x, y, s); y += s + d;
+	str = "systemDamage: "; str += systemDamage.getTimeMSStr();
+	drawText(str.c_str(), x, y, s); y += s + d;
+	str = "systemDead: "; str += systemDead.getTimeMSStr();
+	drawText(str.c_str(), x, y, s); y += s + d;
 }
 void appEnd() {
-	//ThreadPoolDestroy(threadPool);
-}*/
+	ThreadPoolDestroy(threadPool);
+}
+
+*/

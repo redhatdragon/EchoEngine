@@ -51,7 +51,7 @@ void cleanUpButton(Widget* self) {
 
 
 void appStart() {
-    EntityObject player = EntityObjectLoader::createEntityObjectFromFile(std::string(getDirData())+="entities/Reimu.txt");
+    EntityObject player = EntityObjectLoader::createEntityObjectFromFile(std::string(getDirData())+="Entities/Reimu.txt");
 
     ComponentObject* size = player.getComponent("size");
     ComponentObject* texture = player.getComponent("texture");

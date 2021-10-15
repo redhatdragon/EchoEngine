@@ -1,0 +1,1 @@
+copy ".\out\build\x86-Release\EchoEngine.lib" "..\lib\x86\EchoEngine.lib"
