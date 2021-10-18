@@ -16,7 +16,7 @@ public:
 	}
 	virtual void run() {
 		//all units have a moveToLocation component >.>  Need something more dinstinctive.
-		/*uint32_t unitAICount = ecs.getComponentCount(unitAIComponentID);
+		uint32_t unitAICount = ecs.getComponentCount(unitAIComponentID);
 		SystemUtilities::UnitAI* unitAI = (SystemUtilities::UnitAI*)ecs.getComponentBuffer(unitAIComponentID);
 		for (uint32_t i = 0; i < unitAICount; i++, unitAI++) {
 			EntityID owner = ecs.getOwner(unitAIComponentID, i);
@@ -35,7 +35,7 @@ public:
 
 			shootAtTarget:
 			;
-		}*/
+		}
 	}
 	virtual const char* getName() {
 		return "SystemUnitAI";
