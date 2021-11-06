@@ -16,7 +16,6 @@ public:
 			EntityID entity = ecs.getOwner(deadComponentID, i);
 			entities.push_back(entity);
 		}
-		auto e = entities[65999];
 		for (uint32_t i = 0; i < deadCount; i++) {
 			auto e = entities[i];
 			ecs.removeEntity(e);

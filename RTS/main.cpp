@@ -154,7 +154,6 @@ void stressTesting1() {
 	ComponentID controllerComponentID = ecs.registerComponent("controller", NULL);
 	std::string koishiFilepath = getDirData();
 	koishiFilepath += "/Textures/Koishi.png";
-	uint64_t totalFirst = 0, totalSecond = 0;
 	for (uint32_t i = 0; i < 40000; i++) {
 		EntityID entity = ecs.getNewEntity();
 		BodyID bodyID = physics.addBodyRect(i * 96, (uint32_t)96, (uint32_t)64, (uint32_t)64);
@@ -163,7 +162,6 @@ void stressTesting1() {
 		ecs.emplace(entity, bodyComponentID, &bodyID);
 		TextureID koiTexture = TextureCodex::add(koishiFilepath);
 		ecs.emplace(entity, textureComponentID, &koiTexture);
-		//ecs.emplace(entity, deadComponentID, NULL);
 		SystemUtilities::Health health = { 1, 500.0f, {0.0f, .5f, .5f, .5f} };
 		ecs.emplace(entity, healthComponentID, &health);
 	}
@@ -215,8 +213,6 @@ void appStart() {
 	physics.setSolid(bodyID, false);
 	ecs.emplace(camEntity, bodyComponentID, &bodyID);
 	ecs.emplace(camEntity, controllerComponentID, nullptr);
-
-	//profilerDisplayLogs();
 }
 
 void appLoop() {
@@ -227,7 +223,6 @@ void appLoop() {
 		drawText(di.c_str(), x, y, w);
 		y += w + w / 2;
 	}
-	ecs;
 }
 
 void appEnd() {

@@ -43,7 +43,7 @@ namespace SystemUtilities {
 		MoveToLocation moveTo;
 	};
 
-	EntityID spawnEntityAt(std::string& entityPath, Vec2D<uint32_t> pos) {
+	EntityID spawnEntityAt(const std::string& entityPath, Vec2D<uint32_t> pos) {
 		std::string dataDir = getDirData();
 		EntityObject entityObject = EntityObjectLoader::createEntityObjectFromFile(dataDir + entityPath);
 		EntityID entity = ecs.getNewEntity();
@@ -52,6 +52,7 @@ namespace SystemUtilities {
 		if (size) {
 			BodyID bodyID = physics.addBodyRect(pos.x, pos.y, size->getArray()[0], size->getArray()[1]);
 			ComponentID bodyComponentID = ecs.registerComponent("body", sizeof(BodyID));
+			physics.setUserData(bodyID, (void*)entity);
 			ecs.emplace(entity, bodyComponentID, &bodyID);
 		}
 

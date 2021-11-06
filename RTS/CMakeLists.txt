@@ -21,7 +21,7 @@ target_link_libraries(RTS
 	x86/SDL2main
 )
 
-add_compile_options("$<$<CONFIG:DEBUG>:-DDEBUG>")
+#add_compile_options("$<$<CONFIG:DEBUG>:-DDEBUG>")
 
 
 IF(CMAKE_BUILD_TYPE MATCHES x86-Testing)

@@ -7,8 +7,8 @@
 std::unordered_map<std::string, uint64_t> logs;
 
 void profilerLog(const char* name, uint64_t ticksToAdd) {
-	if (logs.find(name) == logs.end()) {
-		logs[name] = ticksToAdd;
+	if (auto log = logs.find(name) == logs.end()) {
+		log = ticksToAdd;
 		return;
 	}
 	logs[name] += ticksToAdd;
