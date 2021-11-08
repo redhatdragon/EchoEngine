@@ -17,7 +17,7 @@ public:
 			entities.push_back(entity);
 		}
 		for (uint32_t i = 0; i < deadCount; i++) {
-			auto e = entities[i];
+			EntityID e = entities[i];
 			ecs.removeEntity(e);
 		}
 

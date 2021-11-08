@@ -43,19 +43,29 @@ public:
 			}
 			//goto getNewTarget;
 			getNewTarget:
-			if (otherBodyIDs.size() == 0) return;
-			BodyID targetBody = otherBodyIDs[0];
-			uint64_t targetDist = (physics.getPos<int32_t>(otherBodyIDs[0]) - physics.getPos<int32_t>(*bodyIDPtr)).getDistanceSquared();
-			for (uint32_t j = 1; j < otherBodyIDs.size(); j++) {
-				EntityID otherEntity = (EntityID)physics.getUserData(otherBodyIDs[j]);
-				if ((physics.getPos<int32_t>(otherBodyIDs[j])-physics.getPos<int32_t>(*bodyIDPtr)).getDistanceSquared() < targetDist) {
-					targetBody = otherBodyIDs[j];
+			{
+				if (otherBodyIDs.size() == 0) return;
+				BodyID targetBodyID = otherBodyIDs[0];
+				uint64_t targetDist = (physics.getPos<int32_t>(otherBodyIDs[0]) - physics.getPos<int32_t>(*bodyIDPtr)).getDistanceSquared();
+				for (uint32_t j = 1; j < otherBodyIDs.size(); j++) {
+					EntityID otherEntity = (EntityID)physics.getUserData(otherBodyIDs[j]);
+					if ((physics.getPos<int32_t>(otherBodyIDs[j])-physics.getPos<int32_t>(*bodyIDPtr)).getDistanceSquared() < targetDist) {
+						targetBodyID = otherBodyIDs[j];
+					}
 				}
+				unitAI->target = (EntityID)physics.getUserData(targetBodyID);
 			}
-			unitAI->target = (EntityID)physics.getUserData(targetBody);
 			return;
 			moveToTarget:
+			{
+				BodyID targetBodyID = *(BodyID*)ecs.getEntityComponent(unitAI->target, bodyComponentID);
+				//unitAI->moveTo.pos = physics.getPos<uint32_t>(targetBodyID);
+				Vec2D<uint32_t> ownerPos = physics.getPos<uint32_t>(*bodyIDPtr);
+				Vec2D<uint32_t> targetPos = physics.getPos<uint32_t>(targetBodyID);
 
+				Vec2D<uint32_t> vel;
+				physics.setVelocity(targetBodyID, vel.x, vel.y);
+			}
 			return;
 			shootAtTarget:
 			
