@@ -63,7 +63,7 @@ public:
 				Vec2D<uint32_t> ownerPos = physics.getPos<uint32_t>(*bodyIDPtr);
 				Vec2D<uint32_t> targetPos = physics.getPos<uint32_t>(targetBodyID);
 
-				Vec2D<uint32_t> vel;
+				Vec2D<FixedPoint<>> vel;
 				physics.setVelocity(targetBodyID, vel.x, vel.y);
 			}
 			return;

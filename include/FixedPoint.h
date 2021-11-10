@@ -12,6 +12,9 @@ public:
 	FixedPoint() {
 		data = 0;
 	}
+	FixedPoint(const FixedPoint& other) {
+		uint32_t otherScale = other.getDecScale();
+	}
 	FixedPoint(uint32_t other) {
 		data = other * decScale;
 	}
@@ -109,6 +112,9 @@ public:
 	inline void setRaw(int32_t other) {
 		data = other;
 	}
+	inline std::string getAsString() const {
+
+	}
 	inline bool fromString(const std::string& _str) {
 		std::string str = _str;
 		char lastChar = str[str.size() - 1];
@@ -149,6 +155,9 @@ public:
 		totalValue += ((decimalNumbers * decScale) / decDigitOffset);
 		data = totalValue;
 		return true;
+	}
+	inline const uint32_t getDecScale() const {
+		return decScale;
 	}
 };
 

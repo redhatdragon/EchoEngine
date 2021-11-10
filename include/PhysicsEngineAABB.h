@@ -1,6 +1,7 @@
 #pragma once
 
 #include "FlatBuffer.h"
+#include "FixedPoint.h"
 #include <time.h>
 
 template<typename T>
@@ -211,7 +212,7 @@ public:
 			uint32_t hashSize = hash->count;
 			for (uint32_t i = 0; i < hashSize; i++) {
 				BodyID bodyID = (*hash)[i];
-				for (auto e : retValue) {
+				for (BodyID e : retValue) {
 					if (e == (*hash)[i]) goto skip;
 				}
 				retValue.push_back(bodyID);
@@ -232,6 +233,11 @@ public:
 		BodyAABB* body = &bodies[id.id];
 		body->vel.x = vx * unit_size;
 		body->vel.y = vy * unit_size;
+	}
+	void setVelocity(BodyID id, FixedPoint<unit_size> vx, FixedPoint<unit_size> vy) {
+		BodyAABB* body = &bodies[id.id];
+		body->vel.x = vx.getRaw();
+		body->vel.y = vy.getRaw();
 	}
 
 	bool getSolid(BodyID id) {
