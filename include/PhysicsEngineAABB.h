@@ -46,13 +46,13 @@ struct Vec2D {
 			x /= dist / unit; y /= dist / unit;
 		}
 	}
-	__forceinline double getDistance() {
+	__forceinline T getDistance() {
 		return sqrt(x * x + y * y);
 	}
 	__forceinline uint64_t getDistanceSquared() {
 		return x * x + y * y;
 	}
-	__forceinline double getDistanceFrom(Vec2D& other) {
+	__forceinline T getDistanceFrom(Vec2D& other) {
 		return (*this - other).getDistance();
 	}
 	__forceinline uint64_t getDistanceFromSquared(Vec2D& other) {

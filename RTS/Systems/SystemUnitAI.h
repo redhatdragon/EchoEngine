@@ -23,7 +23,7 @@ public:
 			BodyID* bodyIDPtr = (BodyID*)ecs.getEntityComponent(owner, bodyComponentID);
 			constexpr uint32_t maxRange = 248;
 			constexpr uint32_t maxRangeSqr = maxRange * maxRange;
-			constexpr uint32_t maxShootingRange = 124;
+			constexpr uint32_t maxShootingRange = 1240;
 			constexpr uint32_t maxShootingRangeSqr = maxShootingRange * maxShootingRange;
 			auto pos = physics.getPos<int32_t>(*bodyIDPtr);
 			Vec2D<int32_t> rangeVec = { maxRange, maxRange };
@@ -58,12 +58,15 @@ public:
 			return;
 			moveToTarget:
 			{
+				std::cout << "hit" << std::endl;
 				BodyID targetBodyID = *(BodyID*)ecs.getEntityComponent(unitAI->target, bodyComponentID);
 				//unitAI->moveTo.pos = physics.getPos<uint32_t>(targetBodyID);
 				Vec2D<uint32_t> ownerPos = physics.getPos<uint32_t>(*bodyIDPtr);
 				Vec2D<uint32_t> targetPos = physics.getPos<uint32_t>(targetBodyID);
-
-				Vec2D<FixedPoint<>> vel;
+				Vec2D<uint32_t> diff = targetPos - ownerPos;
+				Vec2D<FixedPoint<>> vel = {diff.x, diff.y};
+				vel.normalize();
+				vel *= 6;
 				physics.setVelocity(targetBodyID, vel.x, vel.y);
 			}
 			return;

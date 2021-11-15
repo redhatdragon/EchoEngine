@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include <vector>
+#include <string>
 #include <bitset>
 #include <BitBool/BitBool.h>
 

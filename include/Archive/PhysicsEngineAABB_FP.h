@@ -1,7 +1,10 @@
 #pragma once
 
 #include "FlatBuffer.h"
-#include "FixedPoint.h"
+//#include "FixedPoint.h"
+#include <fpm/fixed.hpp>
+#include <fpm/math.hpp>
+#include <fpm/ios.hpp>
 #include <time.h>
 
 template<typename T>
@@ -46,17 +49,23 @@ struct Vec2D {
 			x /= dist / unit; y /= dist / unit;
 		}
 	}
-	__forceinline FixedPoint<> getDistance() {
+	__forceinline double getDistance() {
 		return sqrt(x * x + y * y);
+	}
+	__forceinline uint64_t getDistanceSquared() {
+		return x * x + y * y;
 	}
 	__forceinline double getDistanceFrom(Vec2D& other) {
 		return (*this - other).getDistance();
+	}
+	__forceinline uint64_t getDistanceFromSquared(Vec2D& other) {
+		return (*this - other).getDistanceSquared();
 	}
 };
 
 struct BodyAABB {
 	bool solid;
-	Vec2D<FixedPoint<>> pos, siz, vel;
+	Vec2D<fpm::fixed_24_8> pos, siz, vel;
 
 	__forceinline void simulate() {
 		pos += vel;
@@ -99,16 +108,16 @@ class SpatialHashTable {
 		printf("SpatialHashTable::removeBodyFromHash - Error: body not found in hash!\n");
 	}
 public:
-	void addBody(BodyID id, const Vec2D<FixedPoint<>>& pos, const Vec2D<FixedPoint<>>& siz) {
-		uint32_t startRight = pos.x.getAsInt() / hashWidth, startDown = pos.y.getAsInt() / hashWidth;
-		uint32_t endRight = (pos.x + siz.x).getAsInt() / hashWidth, endDown = (pos.y + siz.y).getAsInt() / hashWidth;
+	void addBody(BodyID id, const Vec2D<fpm::fixed_24_8>& pos, const Vec2D<fpm::fixed_24_8>& siz) {
+		uint32_t startRight = pos.x / hashWidth, startDown = pos.y / hashWidth;
+		uint32_t endRight = (pos.x + siz.x) / hashWidth, endDown = (pos.y + siz.y) / hashWidth;
 		for (uint32_t y = startDown; y <= endDown; y++)
 			for (uint32_t x = startRight; x <= endRight; x++)
 				addBodyToHash(id, x + y * width);
 	}
-	void removeBody(BodyID id, const Vec2D<FixedPoint<>>& pos, const Vec2D<FixedPoint<>>& siz) {
-		uint32_t startRight = pos.x.getAsInt() / hashWidth, startDown = pos.y.getAsInt() / hashWidth;
-		uint32_t endRight = (pos.x + siz.x).getAsInt() / hashWidth, endDown = (pos.y + siz.y).getAsInt() / hashWidth;
+	void removeBody(BodyID id, const Vec2D<fpm::fixed_24_8>& pos, const Vec2D<fpm::fixed_24_8>& siz) {
+		uint32_t startRight = pos.x / hashWidth, startDown = pos.y / hashWidth;
+		uint32_t endRight = (pos.x + siz.x) / hashWidth, endDown = (pos.y + siz.y) / hashWidth;
 		for (uint32_t y = startDown; y <= endDown; y++)
 			for (uint32_t x = startRight; x <= endRight; x++)
 				removeBodyFromHash(id, x + y * width);
@@ -120,22 +129,22 @@ public:
 				return true;
 		return false;
 	}
-	__forceinline std::vector< FlatBuffer<BodyID, max_bodies_per_hash>*> getHashes(Vec2D<FixedPoint<>>& pos, Vec2D<FixedPoint<>>& siz) {
+	__forceinline std::vector< FlatBuffer<BodyID, max_bodies_per_hash>*> getHashes(Vec2D<fpm::fixed_24_8>& pos, Vec2D<fpm::fixed_24_8>& siz) {
 		std::vector< FlatBuffer<BodyID, max_bodies_per_hash>*> returnValue;
-		uint32_t startRight = pos.x.getAsInt() / hashWidth, startDown = pos.y.getAsInt() / hashWidth;
-		uint32_t endRight = (pos.x + siz.x).getAsInt() / hashWidth, endDown = (pos.y + siz.y).getAsInt() / hashWidth;
+		uint32_t startRight = pos.x / hashWidth, startDown = pos.y / hashWidth;
+		uint32_t endRight = (pos.x + siz.x) / hashWidth, endDown = (pos.y + siz.y) / hashWidth;
 		for (uint32_t y = startDown; y <= endDown; y++)
 			for (uint32_t x = startRight; x <= endRight; x++)
 				returnValue.push_back(&hash[x + y * width]);
 		return returnValue;
 	}
 	// This was complicated and may need another look over
-	void getIDs(const Vec2D<FixedPoint<>>& pos, const Vec2D<FixedPoint<>>& siz, std::vector<BodyID>& returnValue) {
-		FixedPoint<> startRight = pos.x / hashWidth, startDown = pos.y / hashWidth;
-		FixedPoint<> endRight = (pos.x + siz.x) / hashWidth, endDown = (pos.y + siz.y) / hashWidth;
-		for (uint32_t y = startDown.getAsInt(); y <= endDown.getAsInt(); y++) {
-			for (uint32_t x = startRight.getAsInt(); x <= endRight.getAsInt(); x++) {
-				uint32_t len = hash[x + y * width].count;
+	void getIDs(const Vec2D<fpm::fixed_24_8>& pos, const Vec2D<fpm::fixed_24_8>& siz, std::vector<BodyID>& returnValue) {
+		uint32_t startRight = (pos.x / hashWidth)., startDown = pos.y / hashWidth;
+		uint32_t endRight = (pos.x + siz.x) / hashWidth, endDown = (pos.y + siz.y) / hashWidth;
+		for (uint32_t y = startDown; y <= endDown; y++) {
+			for (uint32_t x = startRight; x <= endRight; x++) {
+				auto len = hash[x + y * width].count;
 				for (uint32_t i = 0; i < len; i++) {
 					auto retValueLen = returnValue.size();
 					bool hasID = false;
@@ -162,15 +171,16 @@ class PhysicsEngine {
 	FlatBuffer<void*, max_bodies> userData;
 	FlatBuffer<FlatBuffer<BodyID, 100>, max_bodies> overlappingBodyIDs;
 	//SpatialHashTable<300, 300, 128*unit_size> spatialHashTable;
-	SpatialHashTable<2000, 2000, 128 * FIXED_POINT_DEFAULT_SCALE> spatialHashTable;
+	SpatialHashTable<2000, 2000, 128> spatialHashTable;
 	float timeFromStepping = 0;
 public:
 	void init() {
 
 	}
-	BodyID addBodyRect(FixedPoint<> x, FixedPoint<> y, FixedPoint<> w, FixedPoint<> h) {
+	BodyID addBodyRect(int32_t _x, int32_t _y, int32_t _w, int32_t _h) {
+		fpm::fixed_24_8 x(_x), y(_y), w(_w), h(_h), vx(0), vy(0);
 		BodyID retValue;
-		BodyAABB body = { true, { x,y }, { w,h }, { (uint32_t)0,(uint32_t)0 } };
+		BodyAABB body = { true, { x,y }, { w,h }, { vx,vy } };
 		retValue.id = bodies.insert(body);
 		spatialHashTable.addBody(retValue, body.pos, body.siz);
 		overlappingBodyIDs[retValue.id].clear();
@@ -194,7 +204,7 @@ public:
 		return overlappingBodyIDs[id.id];
 	}
 
-	inline std::vector<BodyID> getBodiesInRectRough(Vec2D<FixedPoint<>>& pos, Vec2D<FixedPoint<>>& siz) {
+	inline std::vector<BodyID> getBodiesInRectRough(Vec2D<fpm::fixed_24_8>& pos, Vec2D<fpm::fixed_24_8>& siz) {
 		std::vector<BodyID> retValue;
 
 
@@ -215,12 +225,27 @@ public:
 		return retValue;
 	}
 
-	void addVelocity(BodyID id, FixedPoint<> vx, FixedPoint<> vy) {
+	/*void addVelocity(BodyID id, float vx, float vy) {
+		BodyAABB* body = &bodies[id.id];
+		body->vel.x += vx * unit_size;
+		body->vel.y += vy * unit_size;
+	}
+	void setVelocity(BodyID id, float vx, float vy) {
+		BodyAABB* body = &bodies[id.id];
+		body->vel.x = vx * unit_size;
+		body->vel.y = vy * unit_size;
+	}
+	void setVelocity(BodyID id, FixedPoint<unit_size> vx, FixedPoint<unit_size> vy) {
+		BodyAABB* body = &bodies[id.id];
+		body->vel.x = vx.getRaw();
+		body->vel.y = vy.getRaw();
+	}*/
+	void addVelocity(BodyID id, fpm::fixed_24_8 vx, fpm::fixed_24_8 vy) {
 		BodyAABB* body = &bodies[id.id];
 		body->vel.x += vx;
 		body->vel.y += vy;
 	}
-	void setVelocity(BodyID id, FixedPoint<> vx, FixedPoint<> vy) {
+	void setVelocity(BodyID id, fpm::fixed_24_8 vx, fpm::fixed_24_8 vy) {
 		BodyAABB* body = &bodies[id.id];
 		body->vel.x = vx;
 		body->vel.y = vy;
@@ -233,17 +258,13 @@ public:
 		bodies[id.id].solid = isTrue;
 	}
 
-	template<typename T>
-	Vec2D<T> getPos(BodyID id) {
-		Vec2D<FixedPoint<>> bodyPos = bodies[id.id].pos;
-		Vec2D<T> pos = { bodyPos.x.getAsInt(), bodyPos.y.getAsInt() };
-		return pos;
+	Vec2D<fpm::fixed_24_8> getPos(BodyID id) {
+		Vec2D<fpm::fixed_24_8> bodyPos = bodies[id.id].pos;
+		return bodyPos;
 	}
-	template<typename T>
-	Vec2D<T> getSize(BodyID id) {
-		Vec2D<FixedPoint<>> bodySiz = bodies[id.id].siz;
-		Vec2D<T> siz = { bodySiz.x.getAsInt(), bodySiz.y.getAsInt() };
-		return siz;
+	Vec2D<fpm::fixed_24_8> getSize(BodyID id) {
+		Vec2D<fpm::fixed_24_8> bodySiz = bodies[id.id].siz;
+		return bodySiz;
 	}
 
 	float getTime() {

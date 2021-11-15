@@ -187,7 +187,7 @@ void appStart() {
 	initSystems();
 	profileLinesEnd();
 	//stressTesting1();
-	//testFixedPoint();
+	testFixedPoint();
 	//return;
 
 	EntityID factory1 = buildFactory(64, 256, 1, "Entities/Factory.txt");
