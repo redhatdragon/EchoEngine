@@ -23,13 +23,14 @@ public:
 			BodyID* bodyIDPtr = (BodyID*)ecs.getEntityComponent(owner, bodyComponentID);
 			constexpr uint32_t maxRange = 248;
 			constexpr uint32_t maxRangeSqr = maxRange * maxRange;
-			constexpr uint32_t maxShootingRange = 1240;
+			constexpr uint32_t maxShootingRange = 124;
 			constexpr uint32_t maxShootingRangeSqr = maxShootingRange * maxShootingRange;
 			auto pos = physics.getPos<int32_t>(*bodyIDPtr);
 			Vec2D<int32_t> rangeVec = { maxRange, maxRange };
 			std::vector<BodyID> otherBodyIDs = physics.getBodiesInRectRough(pos, rangeVec);
 			if (ecs.entityHandleValid(unitAI->target, unitAI->targetHandle) == false)
 				goto getNewTarget;
+			printf("Not getting new target\n");
 			//if enemy not in range anymore goto getNewTarget
 			for (uint32_t j = 0; j < otherBodyIDs.size(); j++) {
 				EntityID otherEntity = *(EntityID*)physics.getUserData(otherBodyIDs[j]);
@@ -59,7 +60,7 @@ public:
 			moveToTarget:
 			{
 				std::cout << "hit" << std::endl;
-				BodyID targetBodyID = *(BodyID*)ecs.getEntityComponent(unitAI->target, bodyComponentID);
+				BodyID targetBodyID = (BodyID)ecs.getEntityComponent(unitAI->target, bodyComponentID);
 				//unitAI->moveTo.pos = physics.getPos<uint32_t>(targetBodyID);
 				Vec2D<uint32_t> ownerPos = physics.getPos<uint32_t>(*bodyIDPtr);
 				Vec2D<uint32_t> targetPos = physics.getPos<uint32_t>(targetBodyID);

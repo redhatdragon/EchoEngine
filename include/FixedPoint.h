@@ -14,7 +14,7 @@ public:
 	}
 	FixedPoint(const FixedPoint& other) {
 		uint32_t otherScale = other.getDecScale();
-		//TODO: Finish me!
+		fromString(other.getAsString());
 	}
 	FixedPoint(uint32_t other) {
 		data = other * decScale;
