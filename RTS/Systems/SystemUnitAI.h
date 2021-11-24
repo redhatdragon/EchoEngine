@@ -60,7 +60,7 @@ public:
 			moveToTarget:
 			{
 				std::cout << "hit" << std::endl;
-				BodyID targetBodyID = (BodyID)ecs.getEntityComponent(unitAI->target, bodyComponentID);
+				BodyID targetBodyID = *(BodyID*)ecs.getEntityComponent(unitAI->target, bodyComponentID);
 				//unitAI->moveTo.pos = physics.getPos<uint32_t>(targetBodyID);
 				Vec2D<uint32_t> ownerPos = physics.getPos<uint32_t>(*bodyIDPtr);
 				Vec2D<uint32_t> targetPos = physics.getPos<uint32_t>(targetBodyID);
