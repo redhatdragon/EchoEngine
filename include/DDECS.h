@@ -215,6 +215,7 @@ public:
 			sys->ms = clock()-start;
 		}
 	}
+	// entity must be valid
 	bool entityHandleValid(EntityID entity, EntityHandle handle) {
 		EntityHandle* trueHandle = (EntityHandle*)ecs.getEntityComponent(entity, handleComponentID);
 		if (trueHandle == nullptr || *trueHandle != handle)
@@ -224,8 +225,6 @@ public:
 	std::vector<std::string> getDebugInfo() {
 		std::vector<std::string> retValue;
 		for (System* sys : systems) {
-			//std::string str = decltype(sys);
-			//std::string str = typeid(*sys).name();
 			std::string str = sys->getName();
 			str += ": ";
 			str += sys->getTimeMSStr();
@@ -240,7 +239,7 @@ public:
 class System {
 	template<uint32_t max_components, uint32_t max_entities> friend class DDECS;
 protected:
-	clock_t ms = 0;  //must be updated in every run method
+	clock_t ms = 0;
 public:
 	virtual void init() {};
 	virtual void run() = 0;
