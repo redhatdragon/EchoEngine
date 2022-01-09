@@ -15,6 +15,7 @@ extern PhysicsEngine physics;
 #include "SystemQueSpawn.h"
 #include "SystemMoveTo.h"
 #include "SystemUnitAI.h"
+#include "SystemDestructOnOverlap.h"
 
 void initSystems() {
 	ecs.registerSystem<SystemDeath>();
@@ -26,4 +27,5 @@ void initSystems() {
 	ecs.registerSystem<SystemQueSpawn>();
 	ecs.registerSystem<SystemMoveTo>();
 	ecs.registerSystem<SystemUnitAI>();
+	ecs.registerSystem<SystemDestructOnOverlap>();
 }
