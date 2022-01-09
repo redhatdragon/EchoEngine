@@ -8,8 +8,6 @@ public:
 		deadComponentID = ecs.registerComponent("dead", NULL);
 	}
 	virtual void run() {
-		clock_t startTime = clock();
-
 		uint32_t deadCount = ecs.getComponentCount(deadComponentID);
 		std::vector<EntityID> entities;
 		for (uint32_t i = 0; i < deadCount; i++) {
@@ -20,8 +18,6 @@ public:
 			EntityID e = entities[i];
 			ecs.removeEntity(e);
 		}
-
-		ms = clock() - startTime;
 	}
 	virtual const char* getName() {
 		return "SystemDeath";
