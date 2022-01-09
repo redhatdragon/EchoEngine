@@ -18,7 +18,7 @@ public:
 		for (uint32_t i = 0; i < deadCount; i++) {
 			EntityID entity = ecs.getOwner(destructOnOverlapComponentID, i);
 			BodyID bodyID = *(BodyID*)ecs.getEntityComponent(entity, bodyComponentID);
-			auto overlappingBodies = physics.getOverlappingBodies(bodyID);
+			auto& overlappingBodies = physics.getOverlappingBodies(bodyID);
 			if(overlappingBodies.count)
 				ecs.emplace(entity, deadComponentID, NULL);
 		}
