@@ -272,6 +272,10 @@ namespace EntityObjectLoader {
                 fileText += line + "\n";
             myfile.close();
         }
+        else {
+            std::cout << "Error: createEntityObjectFromFile()'s designated file from 'filename' couldn't be opened" << std::endl;
+            std::cout << "filename was " << filename << std::endl;
+        }
         auto v = createEntityObjectFromString(fileText);
         return v;
     }

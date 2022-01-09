@@ -222,6 +222,9 @@ public:
 			return false;
 		return true;
 	}
+	EntityHandle entityGetHandle(EntityID entity) {
+		return *(EntityHandle*)ecs.getEntityComponent(entity, handleComponentID);
+	}
 	std::vector<std::string> getDebugInfo() {
 		std::vector<std::string> retValue;
 		for (System* sys : systems) {

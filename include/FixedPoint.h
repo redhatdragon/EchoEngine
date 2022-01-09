@@ -12,9 +12,16 @@ public:
 	FixedPoint() {
 		data = 0;
 	}
-	FixedPoint(const FixedPoint& other) {
+	/*FixedPoint(const FixedPoint& other) {
 		uint32_t otherScale = other.getDecScale();
 		fromString(other.getAsString());
+		std::cout << "In FixedPoint(other)" << std::endl;
+		std::cout << "this:" << getRaw() << ", other:" << other.getRaw() << std::endl;
+		std::cout << "this:" << getAsInt() << ", other:" << other.getAsInt() << std::endl;
+		std::cout << "this:" << getAsString() << ", other:" << other.getAsString() << std::endl;
+	}*/
+	FixedPoint(const FixedPoint<decScale>& other) {
+		data = other.data;
 	}
 	FixedPoint(uint32_t other) {
 		data = other * decScale;
@@ -25,56 +32,57 @@ public:
 	FixedPoint(float other) {
 		data = other * decScale;
 	}
-	inline void operator+=(FixedPoint<decScale> other) {
-		data += other.data;
+	inline void operator+=(FixedPoint<decScale>& other) {
+		data = data + other.data;
 	}
-	inline void operator-=(FixedPoint<decScale> other) {
-		data -= other.data;
+	inline void operator-=(FixedPoint<decScale>& other) {
+		data = data - other.data;
 	}
-	inline void operator*=(FixedPoint<decScale> other) {
-		data *= other.data;
+	inline void operator*=(FixedPoint<decScale>& other) {
+		//TODO: does data need to be (int64_t)?
+		data = (int64_t)((int64_t)data * other.data) / decScale;  //TODO: less accurate than the below?
+		//auto value = (int64_t)(data * other.data) / (decScale / 2);
+		//data = (value / 2) + (value % 2);
 	}
-	inline void operator/=(FixedPoint<decScale> other) {
-		data /= other.data;
+	inline void operator/=(FixedPoint<decScale>& other) {
+		data = (int64_t)((int64_t)data * decScale) / other.data;
 	}
-	FixedPoint<> operator+(const FixedPoint<decScale> other) const {
-		return data + other.data;
+	/*FixedPoint<decScale> operator+(int32_t other) const {
+		//return data + (other.data / decScale);
 	}
-	FixedPoint<> operator-(const FixedPoint<decScale> other) const {
-		return data - other.data;
+	FixedPoint<decScale> operator-(int32_t other) const {
+		//return data - (other.data / decScale);
 	}
-	FixedPoint<> operator*(const FixedPoint<decScale> other) const {
-		return data * other.data;
+	FixedPoint<decScale> operator*(int32_t other) const {
+		return (data * other.data) / decScale;
 	}
-	FixedPoint<> operator/(const FixedPoint<decScale> other) const {
-		return data / other.data;
+	FixedPoint<decScale> operator/(int32_t other) const {
+		return (data / other.data) * decScale;
+	}*/
+	FixedPoint<decScale> operator+(const FixedPoint<decScale>& other) const {
+		FixedPoint<decScale> retValue; retValue.setRaw((data + other.data));
+		return retValue;
+	}
+	FixedPoint<decScale> operator-(const FixedPoint<decScale>& other) const {
+		FixedPoint<decScale> retValue; retValue.setRaw((data - other.data));
+		return retValue;
+	}
+	FixedPoint<decScale> operator*(const FixedPoint<decScale>& other) const {
+		FixedPoint<decScale> retValue; retValue.setRaw((int64_t)((int64_t)data * other.data) / decScale);
+		return retValue;
+	}
+	FixedPoint<decScale> operator/(const FixedPoint<decScale>& other) const {
+		FixedPoint<decScale> retValue; retValue.setRaw((int64_t)((int64_t)data * decScale) / other.data);
+		return retValue;
 	}
 	inline void operator++() {
 		data += decScale;
 	}
-	//TODO: are these needed?
-	inline FixedPoint<decScale> operator+(FixedPoint<decScale> other) {
-		FixedPoint<decScale> retValue;
-		retValue.setRaw(this->data);
-		retValue += other;
-		return retValue;
+	inline void operator--() {
+		data -= decScale;
 	}
-	inline FixedPoint<decScale> operator-(FixedPoint<decScale> other) {
-		FixedPoint<decScale> retValue;
-		retValue.setRaw(this->data);
-		retValue -= other;
-		return retValue;
-	}
-	inline FixedPoint<decScale> operator*(FixedPoint<decScale> other) {
-		FixedPoint<decScale> retValue;
-		retValue.setRaw(this->data);
-		retValue *= other;
-		return retValue;
-	}
-	inline FixedPoint<decScale> operator/(FixedPoint<decScale> other) {
-		FixedPoint<decScale> retValue;
-		retValue.setRaw(this->data);
-		retValue /= other;
+	constexpr inline FixedPoint<decScale> operator-() const noexcept {
+		FixedPoint retValue; retValue.setRaw(-data);
 		return retValue;
 	}
 	inline bool operator<=(FixedPoint<decScale> other) const {
@@ -223,6 +231,18 @@ int32_t sqrtI32(int32_t v) {
 FixedPoint<> sqrt(const FixedPoint<>& var) {
 	int32_t value = var.getAsInt();  //or value = input.getAsRaw()/256;
 	return sqrtI32(value);  //or retValue.setRaw(sqrt(value)*256);
+	
+	//int32_t value = var.getRaw();
+	//return sqrtI32(value)/var.getDecScale();
+
+	//int32_t value = var.getRaw();
+	//return sqrtI32(value);
+	
+	//FixedPoint<> value;
+	//value.fromString(std::to_string(sqrt(var.getAsFloat())));
+	//return value;
+
+	//return sqrt(var.getAsFloat());
 };
 
 
@@ -242,41 +262,183 @@ std::string T_FixedPointInitialize() {
 }
 std::string T_FixedPointGetAsString() {
 	FixedPoint<100> value;
-	std::string retValue = "";
 	value.fromString("0.3f");
 	if (value.getAsString() != "0.3f") {
-		retValue += "Expected string 0.3f but got ";
+		std::string retValue = "Expected string 0.3f but got ";
 		retValue += value.getAsString();
 		return retValue;
 	}
 	return "";
 }
-/*std::string T_FixedPointSqrt() {
+std::string T_FixedPointArithmatic() {
 	FixedPoint<> value;
-	std::string retValue = "";
-	value.fromString("9.5f"); 
-	value.setRaw(value.getRaw() ^ 2);
-	if (sqrt(value).getAsFloat() != sqrt(value.getAsFloat())) {
-		retValue += "Expected value ";
-		retValue += std::to_string(sqrt(value.getAsFloat()));
-		retValue += " instead got ";
-		retValue += std::to_string(sqrt(value).getAsFloat());
+	std::string retValue = "Within...\n";
+	{
+		retValue += "=MULTIPLY\n";
+		value.fromString("5.5f");
+		value *= FixedPoint<>(2);
+		if (value.getAsString() != "11.0f") {
+			retValue += "5.5f*2 should = 11.0f not ";
+			retValue += value.getAsString(); retValue += '\n';
+		}
+	}
+	{
+		retValue += "=DIVISION\n";
+		value.fromString("11.0f");
+		value /= FixedPoint<>(2);
+		if (value.getAsString() != "5.5f") {
+			retValue += "11.0f/2 should = 5.5f not ";
+			retValue += value.getAsString(); retValue += '\n';
+		}
+	}
+	{
+		retValue += "=ADDITION\n";
+		value.fromString("5.5f");
+		value += value;
+		if (value.getAsString() != "11.0f") {
+			retValue += "5.5f+5.5f should = 11.0f not ";
+			retValue += value.getAsString(); retValue += '\n';
+		}
+	}
+	{
+		retValue += "=SUBTRACTION\n";
+		value.fromString("11.0f");
+		FixedPoint<> value2; value2.fromString("5.5f");
+		value -= value2;
+		if (value.getAsString() != "5.5f") {
+			retValue += "11.0f-5.5f should = 5.5f not ";
+			retValue += value.getAsString(); retValue += '\n';
+		}
+	}
+	{
+		retValue += "MULTIPLY\n";
+		value.fromString("5.5f");
+		value = value * FixedPoint<>(2);
+		if (value.getAsString() != "11.0f") {
+			retValue += "5.5f*2 should = 11.0f not ";
+			retValue += value.getAsString(); retValue += '\n';
+		}
+	}
+	{
+		retValue += "DIVISION\n";
+		value.fromString("11.0f");
+		value = value / FixedPoint<>(2);
+		if (value.getAsString() != "5.5f") {
+			retValue += "11.0f/2 should = 5.5f not ";
+			retValue += value.getAsString(); retValue += '\n';
+		}
+	}
+	{
+		retValue += "ADDITION\n";
+		value.fromString("5.5f");
+		value = value + value;
+		if (value.getAsString() != "11.0f") {
+			retValue += "5.5f+5.5f should = 11.0f not ";
+			retValue += value.getAsString(); retValue += '\n';
+		}
+	}
+	{
+		retValue += "SUBTRACTION\n";
+		value.fromString("11.0f");
+		FixedPoint<> value2; value2.fromString("5.5f");
+		value = value - value2;
+		if (value.getAsString() != "5.5f") {
+			retValue += "11.0f-5.5f should = 5.5f not ";
+			retValue += value.getAsString(); retValue += '\n';
+		}
 	}
 	return retValue;
-}*/
+}
+std::string T_FixedPointNegativeArithmatic() {
+	FixedPoint<> value;
+	std::string retValue = "Within...\n";
+	{
+		retValue += "=MULTIPLY\n";
+		value.fromString("5.5f");
+		value = -value;
+		value *= FixedPoint<>(2);
+		if (value.getAsString() != "-11.0f") {
+			retValue += "-5.5f*2 should = -11.0f not ";
+			retValue += std::to_string(value.getAsFloat()); retValue += '\n';
+		}
+	}
+	{
+		retValue += "=DIVISION\n";
+		value.fromString("11.0f");
+		value = -value;
+		value /= FixedPoint<>(2);
+		if (value.getAsString() != "-5.5f") {
+			retValue += "-11.0f/2 should = -5.5f not ";
+			retValue += std::to_string(value.getAsFloat()); retValue += '\n';
+		}
+	}
+	{
+		retValue += "=ADDITION\n";
+		value.fromString("5.5f");
+		value = -value;
+		value += value;
+		if (value.getAsString() != "11.0f") {
+			retValue += "-5.5f+-5.5f should = -11.0f not ";
+			retValue += std::to_string(value.getAsFloat()); retValue += '\n';
+		}
+	}
+	{
+		retValue += "=SUBTRACTION\n";
+		value.fromString("11.0f");
+		FixedPoint<> value2; value2.fromString("5.5f");
+		value = -value;
+		value -= value2;
+		if (value.getAsString() != "-16.5f") {
+			retValue += "-11.0f-5.5f should = -16.5f not ";
+			retValue += std::to_string(value.getAsFloat()); retValue += '\n';
+		}
+	}
+	return retValue;
+}
+std::string T_FixedPointSqrt() {
+	FixedPoint<> value;
+	value.fromString("9.5f"); 
+	value = sqrt(value);
+	float comparedTo = sqrt(9.5f);
+	if (value.getAsString() != std::to_string(comparedTo)) {
+		std::string retValue = "Expected value ";
+		retValue += std::to_string(comparedTo);
+		retValue += " instead got ";
+		retValue += value.getAsString();
+		return retValue;
+	}
+	return "";
+}
 #endif
 void testFixedPoint() {
 #ifdef TESTING
 	std::string dbgStr = "";
 	dbgStr = T_FixedPointInitialize();
 	if (dbgStr != "") {
+		std::cout << "T_FixedPointInitialize(): ";
 		std::cout << dbgStr << std::endl;
 		dbgStr = "";
 	}
 	dbgStr = T_FixedPointGetAsString();
 	if (dbgStr != "") {
+		std::cout << "T_FixedPointGetAsString(): ";
 		std::cout << dbgStr << std::endl;
 		dbgStr = "";
+	}
+	dbgStr = T_FixedPointArithmatic();
+	if (dbgStr != "") {
+		std::cout << "T_FixedPointArithmatic(): ";
+		std::cout << dbgStr << std::endl;
+	}
+	dbgStr = T_FixedPointNegativeArithmatic();
+	if (dbgStr != "") {
+		std::cout << "T_FixedPointNegativeArithmatic(): ";
+		std::cout << dbgStr << std::endl;
+	}
+	dbgStr = T_FixedPointSqrt();
+	if (dbgStr != "") {
+		std::cout << "T_FixedPointSqrt(): ";
+		std::cout << dbgStr << std::endl;
 	}
 #endif
 }

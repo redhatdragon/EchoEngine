@@ -13,7 +13,8 @@ class SystemQueSpawn : public System {
 	ComponentID queSpawnComponentID = -1;
 	ComponentID queTickComponentID = -1;
 	ComponentID quableEntitiesComponentID = -1;
-	ComponentID moveToLocationComponentID = -1;
+	//ComponentID moveToLocationComponentID = -1;
+	ComponentID unitAIComponentID = -1;
 	ComponentID queWaypointComponentID = -1;
 public:
 	virtual void init() {
@@ -22,7 +23,8 @@ public:
 		queSpawnComponentID = ecs.registerComponent("queSpawn", sizeof(Vec2D<uint32_t>));
 		queTickComponentID = ecs.registerComponent("queTick", sizeof(uint32_t));
 		quableEntitiesComponentID = ecs.registerComponent("quableEntities", sizeof(DArray<Name>));
-		moveToLocationComponentID = ecs.registerComponent("moveToLocation", sizeof(SystemUtilities::MoveToLocation));
+		//moveToLocationComponentID = ecs.registerComponent("moveToLocation", sizeof(SystemUtilities::MoveToLocation));
+		unitAIComponentID = ecs.registerComponent("unitAI", sizeof(SystemUtilities::UnitAI));
 		queWaypointComponentID = ecs.registerComponent("queWaypoint", sizeof(uint32_t) * 2);
 	}
 	virtual void run() {
@@ -47,7 +49,6 @@ public:
 				continue;
 			}
 			queTick = 300;
-			printf("spawn\n");
 			DArray<Name>& quableEntities = *(DArray<Name>*)ecs.getEntityComponent(owner, quableEntitiesComponentID);
 			if (&quableEntities == nullptr) {
 				std::cout << "Error: SystemQueSpawn{} factory like entity without quableEntities component" << std::endl;
@@ -58,16 +59,20 @@ public:
 				for (uint32_t j = 1; j < que.count; j++) {
 					ques.push_back(que[j]);
 				}
-				memcpy(&que[0], &ques[0], sizeof(Name)*ques.size());
+				memcpy(&que[0], &ques[0], sizeof(Name)*ques.size());  //TODO: what?
 			}
 			que.pop();
 			std::string entityPath = getDirData();
 			entityPath += "Entities/Solder.txt";
 			EntityID spawnedEntity = SystemUtilities::spawnEntityAt(entityPath, {queSpawn->x, queSpawn->y});
+			printf("spawn\n");
+			std::cout << "Pos is: " << queSpawn->x << ", " << queSpawn->y << std::endl;
 			uint32_t* queWaypoint = (uint32_t*)ecs.getEntityComponent(owner, queWaypointComponentID);
 			if (queWaypoint == nullptr) continue;
-			SystemUtilities::MoveToLocation move = { {queWaypoint[0], queWaypoint[1]}, {16, 16}, 5 };
-			ecs.emplace(spawnedEntity, moveToLocationComponentID, &move);
+			SystemUtilities::MoveToLocation moveTo = { {queWaypoint[0], queWaypoint[1]}, {16, 16}, 5 };
+			SystemUtilities::UnitAI unitAI;
+			unitAI.moveTo = moveTo;
+			ecs.emplace(spawnedEntity, unitAIComponentID, &unitAI);
 			std::cout << spawnedEntity << " " << queWaypoint[0] << " " << queWaypoint[1] << " " 
 				<< queSpawn->x << " " << queSpawn->y << std::endl;
 		}

@@ -38,9 +38,17 @@ namespace SystemUtilities {
 		FixedPoint<> speed;
 	};
 	struct UnitAI {
-		EntityID target;
+		EntityID target = -1;
 		EntityHandle targetHandle;
 		MoveToLocation moveTo;
+		inline bool hasValidTarget() const {
+			if (target == -1) return false;
+			return ecs.entityHandleValid(target, targetHandle);
+		}
+		inline void setTarget(EntityID entity) {
+			target = entity;
+			targetHandle = ecs.entityGetHandle(entity);
+		}
 	};
 
 	EntityID spawnEntityAt(const std::string& entityPath, Vec2D<uint32_t> pos) {

@@ -68,6 +68,14 @@ EntityID buildFactory(uint32_t x, uint32_t y, uint32_t team, const std::string& 
 		ecs.removeEntity(entity);
 		return -1;
 	}
+	ComponentObject* health = entityObject.getComponent("health");
+	if (componentExistsErrorCheck(entityObject, "health", "buildFactory()'s factoryFilepath's",
+		ComponentObject::TYPE::TYPE_ARRAY, 6) == false) {
+		ecs.removeEntity(entity);
+		return -1;
+	}
+	auto healthBuffer = health->getArray();
+	healthBuffer[0] = team;
 	ComponentObject* queSpawn = entityObject.getComponent("queSpawn");
 	{
 		uint32_t* queSpawnArr= queSpawn->getArray();
@@ -188,6 +196,7 @@ void appStart() {
 	profileLinesEnd();
 	//stressTesting1();
 	testFixedPoint();
+	testVec2D();
 	//return;
 
 	EntityID factory1 = buildFactory(64, 256, 1, "Entities/Factory.txt");
@@ -199,7 +208,7 @@ void appStart() {
 	addQueToFactory(factory2, "solder");
 	addQueToFactory(factory2, "solder");
 
-	EntityID camEntity = ecs.getNewEntity();
+	/*EntityID camEntity = ecs.getNewEntity();
 	unsigned int width, height;
 	getCanvasSize(&width, &height);
 	Name path = "Textures/Koishi.png";
@@ -213,16 +222,26 @@ void appStart() {
 	physics.setSolid(bodyID, false);
 	ecs.emplace(camEntity, bodyComponentID, &bodyID);
 	ecs.emplace(camEntity, controllerComponentID, nullptr);
+	*/
+	EntityID camEntity = ecs.getNewEntity();
+	unsigned int width, height;
+	getCanvasSize(&width, &height);
+	SystemUtilities::spawnEntityAt("Entities/Player.txt", { width / 2 - 200, height / 2 });
 }
 
 void appLoop() {
 	ecs.runSystems();
 	auto systemsDebugInfo = ecs.getDebugInfo();
 	int x = 16, y = 16, w = 16;
+	std::string entityCountStr = "EntityCount->";
+	entityCountStr += std::to_string(ecs.getEntityCount());
+	drawText(entityCountStr.c_str(), x, y, w);
+	y += w + w / 2;
 	for (auto& di : systemsDebugInfo) {
 		drawText(di.c_str(), x, y, w);
 		y += w + w / 2;
 	}
+	//drawText(std::to_string(TextureCodex::refCount[1]).c_str(), 600, 200, 16);
 }
 
 void appEnd() {

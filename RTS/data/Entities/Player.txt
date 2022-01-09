@@ -1,0 +1,6 @@
+#Reserved components for the level editor
+size = [8, 8];
+getTexture = "Textures/Koishi.png";
+
+camera = NULL;
+controller = NULL;
