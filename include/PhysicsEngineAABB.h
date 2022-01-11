@@ -271,7 +271,8 @@ public:
 			if (bodies.getIsValid(i) == false)
 				continue;
 			validBodyCount++;
-			if (overlappingBodyIDs[i].count && bodies[i].vel.isZero() == false && bodies[i].solid) {
+			if (overlappingBodyIDs[i].count && bodies[i].vel.isZero() == false && bodies[i].solid
+				&& areAnyOverlappingBodiesSolid(i) == true) {
 				spatialHashTable.removeBody({ i }, bodies[i].pos, bodies[i].siz);
 				bodies[i].reverseSimulate();
 				spatialHashTable.addBody({ i }, bodies[i].pos, bodies[i].siz);
@@ -294,5 +295,14 @@ private:
 			if (overlappingBodyIDs[index][i].id == id.id)
 				return;
 		overlappingBodyIDs[index].push(id);
+	}
+	bool areAnyOverlappingBodiesSolid(uint32_t bodyIndex) {
+		uint32_t overlappingCount = overlappingBodyIDs[bodyIndex].count;
+		for (uint32_t j = 0; j < overlappingCount; j++) {
+			BodyID otherBody = overlappingBodyIDs[bodyIndex][j];
+			if (bodies[otherBody.id].solid)
+				return true;
+		}
+		return false;
 	}
 };
