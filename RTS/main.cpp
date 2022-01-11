@@ -79,8 +79,8 @@ EntityID buildFactory(uint32_t x, uint32_t y, uint32_t team, const std::string& 
 	ComponentObject* queSpawn = entityObject.getComponent("queSpawn");
 	{
 		uint32_t* queSpawnArr= queSpawn->getArray();
-		queSpawnArr[0] = x + size->getArray()[0]+32;
-		queSpawnArr[1] = y + size->getArray()[1]+32;
+		queSpawnArr[0] = x + size->getArray()[0];
+		queSpawnArr[1] = y + size->getArray()[1];
 	}
 	if (entityObject.getComponent("queWaypoint") != nullptr) {
 		std::cout << "Error: BuildFactory()'s factoryFilepath has queWaypoint when it shouldn't." << std::endl;
@@ -199,14 +199,25 @@ void appStart() {
 	testVec2D();
 	//return;
 
-	EntityID factory1 = buildFactory(64, 256, 1, "Entities/Factory.txt");
+	for (uint32_t i = 0; i < 100; i++) {
+		EntityID factory1 = buildFactory(64, 256+i*52, 1, "Entities/Factory.txt");
+		EntityID factory2 = buildFactory(512, 256+i*52, 2, "Entities/Factory.txt");
+		setFactoryWaypoint(factory1, (512 - 64) / 2, 256);
+		setFactoryWaypoint(factory2, (512 - 64) / 2, 256);
+		addQueToFactory(factory1, "solder");
+		addQueToFactory(factory1, "solder");
+		addQueToFactory(factory2, "solder");
+		addQueToFactory(factory2, "solder");
+	}
+
+	/*EntityID factory1 = buildFactory(64, 256, 1, "Entities/Factory.txt");
 	EntityID factory2 = buildFactory(512, 256, 2, "Entities/Factory.txt");
 	setFactoryWaypoint(factory1, (512-64)/2, 256);
 	setFactoryWaypoint(factory2, (512-64)/2, 256);
 	addQueToFactory(factory1, "solder");
 	addQueToFactory(factory2, "solder");
 	addQueToFactory(factory2, "solder");
-	addQueToFactory(factory2, "solder");
+	addQueToFactory(factory2, "solder");*/
 
 	/*EntityID camEntity = ecs.getNewEntity();
 	unsigned int width, height;
