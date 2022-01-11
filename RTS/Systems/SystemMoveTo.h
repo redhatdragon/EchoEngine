@@ -25,11 +25,12 @@ public:
 					<< "'body' component required to obtain/alter position.  Skipping..." << std::endl;
 				continue;
 			}
-			Vec2D<float> vel;
-			Vec2D<float> pos = physics.getPos<float>(*bodyIDPtr);
+			Vec2D<FixedPoint<>> vel;
+			Vec2D<uint32_t> pos = physics.getPos<uint32_t>(*bodyIDPtr);
 			vel.x = move->pos.x - pos.x;
 			vel.y = move->pos.y - pos.y;
 			vel.normalize();
+			vel *= move->speed;
 			physics.setVelocity(*bodyIDPtr, vel.x, vel.y);
 		}
 	}
