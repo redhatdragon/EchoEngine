@@ -6,19 +6,19 @@
 
 class SystemUnitAI : public System {
 	ComponentID bodyComponentID = -1;
-	//ComponentID moveToLocationComponentID = -1;
 	ComponentID unitAIComponentID = -1;
 	ComponentID healthComponentID = -1;  //Used to get team
+	ComponentID moveToLocationComponentID = -1;
 	static constexpr uint32_t maxRange = 248;
 	static constexpr uint32_t maxRangeSqr = maxRange * maxRange;
-	static constexpr uint32_t maxShootingRange = 124;
-	static constexpr uint32_t maxShootingRangeSqr = maxShootingRange * maxShootingRange;
+	static constexpr uint32_t maxShootingRange = 1240;
+	static constexpr uint64_t maxShootingRangeSqr = maxShootingRange * maxShootingRange;
 public:
 	virtual void init() {
 		bodyComponentID = ecs.registerComponent("body", sizeof(BodyID));
-		//moveToLocationComponentID = ecs.registerComponent("moveToLocation", sizeof(SystemUtilities::MoveToLocation));
 		unitAIComponentID = ecs.registerComponent("unitAI", sizeof(SystemUtilities::UnitAI));
 		healthComponentID = ecs.registerComponent("health", sizeof(SystemUtilities::Health));
+		moveToLocationComponentID = ecs.registerComponent("moveToLocation", sizeof(SystemUtilities::MoveToLocation));
 	}
 	virtual void run() {
 		//all units have a moveToLocation component >.>  Need something more dinstinctive.
@@ -37,7 +37,13 @@ public:
 			}
 			//printf("Found Target\n");
 			auto pos = physics.getPos<int32_t>(*bodyIDPtr);
-			shootIfInRange(unitAI, pos);
+			static int shootingTick = 20;
+			if (shootingTick == 0) {
+				shootIfInRange(unitAI, pos);
+				shootingTick = 20;
+			}
+			//shootIfInRange(unitAI, pos);
+			shootingTick--;
 			moveToWaypoint(unitAI, bodyIDPtr);
 			//moveToTarget(unitAI, bodyIDPtr);
 		}
@@ -47,7 +53,7 @@ public:
 		BodyID targetBodyID = enemyBodyIDs[0];
 		uint64_t targetDist = (physics.getPos<int32_t>(enemyBodyIDs[0]) - physics.getPos<int32_t>(*bodyID)).getDistanceSquared();
 		for (uint32_t j = 1; j < enemyBodyIDs.size(); j++) {
-			EntityID otherEntity = (EntityID)physics.getUserData(enemyBodyIDs[j]);
+			//EntityID otherEntity = (EntityID)physics.getUserData(enemyBodyIDs[j]);
 			if ((physics.getPos<int32_t>(enemyBodyIDs[j]) - physics.getPos<int32_t>(*bodyID)).getDistanceSquared() < targetDist) {
 				targetBodyID = enemyBodyIDs[j];
 			}
@@ -68,7 +74,7 @@ public:
 		}
 		for (BodyID* elem = &IDs[0], *end = &IDs[IDs.size()-1]; elem != end; elem++) {
 			EntityID otherOwner = (EntityID)physics.getUserData(*elem);
-			SystemUtilities::Health * otherHealth = (SystemUtilities::Health*)ecs.getEntityComponent(otherOwner, healthComponentID);
+			SystemUtilities::Health* otherHealth = (SystemUtilities::Health*)ecs.getEntityComponent(otherOwner, healthComponentID);
 			if (otherHealth == nullptr) continue;
 			if (otherHealth->team != health->team)
 				enemyIDs.push_back(*elem);
@@ -82,10 +88,14 @@ public:
 		Vec2D<int32_t> otherPos = physics.getPos<int32_t>(*otherBody);
 		uint64_t distanceSqr = ownerPos.getDistanceFromSquared(otherPos);
 		if (distanceSqr <= maxShootingRangeSqr) {
-			Vec2D<int32_t> direction = ownerPos-otherPos;
+			Vec2D<int32_t> directionAsInt = ownerPos-otherPos;
+			Vec2D<FixedPoint<>> direction = { directionAsInt.x, directionAsInt.y };
 			direction.normalize();
-			Vec2D<int32_t> spawnPos = ownerPos + (direction * 40);
-			//SystemUtilities::spawnEntityAt("Entities/Bullet.txt", { (uint32_t)spawnPos.x, (uint32_t)spawnPos.y} );
+			Vec2D<FixedPoint<>> spawnPosFP = Vec2D<FixedPoint<>>{ownerPos.x, ownerPos.y} - (direction * 20);
+			EntityID bullet = SystemUtilities::spawnEntityAt("Entities/Bullet.txt", { (uint32_t)spawnPosFP.x.getAsInt(), (uint32_t)spawnPosFP.y.getAsInt()} );
+			SystemUtilities::MoveToLocation moveTo = { {otherPos.x, otherPos.y}, {1, 1}, 6 };
+			ecs.emplace(bullet, moveToLocationComponentID, &moveTo);
+			//ecs.getEntityComponent(bullet, damage);
 			//SystemUtilities::spawnEntityAt("Entities/Bullet.txt", { (uint32_t)400, (uint32_t)20 });
 		}
 	}
@@ -97,7 +107,7 @@ public:
 		//std::cout << (int32_t)diff.x << " - " << (int32_t)diff.y << std::endl;
 		Vec2D<FixedPoint<>> vel = { diff.x, diff.y };
 		//std::cout << vel.x.getAsFloat() << " v " << vel.y.getAsFloat() << std::endl;
-		vel *= 10;  //TODO: remove after testing
+		//vel *= 10;  //TODO: remove after testing
 		vel.normalize();
 		//std::cout << vel.x.getAsFloat() << " n " << vel.y.getAsFloat() << std::endl;
 		vel *= 2;
