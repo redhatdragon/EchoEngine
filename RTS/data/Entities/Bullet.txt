@@ -6,4 +6,4 @@ getTexture = "Textures/Bullet.png";
 destructOnOverlap = NULL;
 
 #{team, base, {TRUE, AP, EXPLOSIVE, BALISTIC}}
-damageOnOverlap = [0,2.0f,   0.0f,0.2f,0.1f,1.0f];
+damageOnCollision = [0,2.0f,   0.0f,0.2f,0.1f,1.0f];
