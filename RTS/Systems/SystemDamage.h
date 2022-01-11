@@ -36,7 +36,7 @@ public:
 					if (dmgOnCollision->modifiers[k].getRaw() == 0) continue;
 					FixedPoint<> attack = dmgOnCollision->base * dmgOnCollision->modifiers[k];
 					if (otherHealth->modifiers[k].getRaw() == 0) continue;
-					totalAttack = attack / otherHealth->modifiers[k];
+					totalAttack += attack / otherHealth->modifiers[k];
 				}
 				if (otherHealth->base <= totalAttack) {
 					otherHealth->base.setRaw(0);
