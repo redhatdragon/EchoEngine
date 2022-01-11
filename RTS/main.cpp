@@ -62,6 +62,7 @@ EntityID buildFactory(uint32_t x, uint32_t y, uint32_t team, const std::string& 
 	ComponentObject* size = entityObject.getComponent("size");
 	BodyID bodyID = physics.addBodyRect(x, y, size->getArray()[0], size->getArray()[1]);
 	physics.setUserData(bodyID, (void*)entity);
+	physics.setSolid(bodyID, false);
 	ecs.emplace(entity, bodyComponentID, &bodyID);
 	if (componentExistsErrorCheck(entityObject, "queSpawn", "buildFactory()'s factoryFilepath's",
 		ComponentObject::TYPE::TYPE_ARRAY, 2) == false) {
