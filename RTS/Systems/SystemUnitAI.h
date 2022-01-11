@@ -123,7 +123,7 @@ public:
 		Vec2D<uint32_t> diff = targetPos - ownerPos;
 		Vec2D<FixedPoint<>> vel = { diff.x, diff.y };
 		vel.normalize();
-		vel *= 6;
+		vel *= 2;
 		physics.setVelocity(targetBodyID, vel.x, vel.y);
 	}
 	virtual const char* getName() {
