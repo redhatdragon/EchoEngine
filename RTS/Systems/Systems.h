@@ -20,9 +20,9 @@ extern PhysicsEngine physics;
 void initSystems() {
 	ecs.registerSystem<SystemDeath>();
 	ecs.registerSystem<SystemDisplay>();
+	ecs.registerSystem<SystemPhysics>();
 	ecs.registerSystem<SystemGetTexture>();
 	ecs.registerSystem<SystemDamage>();
-	ecs.registerSystem<SystemPhysics>();
 	ecs.registerSystem<SystemController>();
 	ecs.registerSystem<SystemQueSpawn>();
 	ecs.registerSystem<SystemMoveTo>();
