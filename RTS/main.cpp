@@ -200,6 +200,11 @@ void appStart() {
 	testVec2D();
 	//return;
 
+	SystemUtilities::spawnEntityAtWithSize("Entities/Killzone.txt", { 0, 0 }, { 2000, 20 });
+	SystemUtilities::spawnEntityAtWithSize("Entities/Killzone.txt", { 0, 0 }, { 20, 2000 });
+	SystemUtilities::spawnEntityAtWithSize("Entities/Killzone.txt", { 2000-20, 0 }, { 20, 2000 });
+	SystemUtilities::spawnEntityAtWithSize("Entities/Killzone.txt", { 0, 2000-20 }, { 2000, 20 });
+
 	for (uint32_t i = 0; i < 100; i++) {
 		EntityID factory1 = buildFactory(64, 256+i*52, 1, "Entities/Factory.txt");
 		EntityID factory2 = buildFactory(512, 256+i*52, 2, "Entities/Factory.txt");

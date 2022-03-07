@@ -84,6 +84,19 @@ namespace SystemUtilities {
 		}
 		return entity;
 	}
+	EntityID spawnEntityAtWithSize(const std::string& entityPath, Vec2D<uint32_t> pos, Vec2D<uint32_t> siz) {
+		EntityID retValue = spawnEntityAt(entityPath, pos);
+		ComponentID bodyComponentID = ecs.registerComponent("body", sizeof(BodyID));
+		if (ecs.entityHasComponent(retValue, bodyComponentID)) {
+			std::cout << "Error: spawnEntityAtWithSize()'s entity from entityPath had a size declared in file " <<
+				entityPath << std::endl;
+			return -1;
+		}
+		BodyID bodyID = physics.addBodyRect(pos.x, pos.y, siz.x, siz.y);
+		physics.setUserData(bodyID, (void*)retValue);
+		ecs.emplace(retValue, bodyComponentID, &bodyID);
+		return retValue;
+	}
 
 	inline uint64_t getEntityDistanceSquared(EntityID e1, EntityID e2) {
 		ComponentID bodyComponentID = ecs.getComponentID("body");

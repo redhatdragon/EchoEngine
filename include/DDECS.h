@@ -78,6 +78,9 @@ public:
 			entities[i].clear();
 		}
 		handleComponentID = registerComponent("handle", sizeof(EntityHandle));
+		for (unsigned int i = 0; i < max_components; i++) {
+			destructors[i] = nullptr;
+		}
 	}
 	~DDECS() {
 		size_t count = systems.size();
@@ -131,6 +134,11 @@ public:
 		return { (uint32_t)-1 };
 	}
 	void emplace(EntityID entity, ComponentID componentID, void* data) {
+		if (entityHasComponent(entity, componentID)) {
+			std::cout << "warning: entity already had component " << components[componentID].name
+				<< " " << "canceling emplace()" << std::endl;
+			return;
+		}
 		ComponentBuffer* buffer = &components[componentID];
 		buffer->push(data, entity);
 		auto componentSize = buffer->getComponentSize();
@@ -140,7 +148,14 @@ public:
 	}
 	void removeComponent(EntityID entity, ComponentID componentID) {
 		auto index = entities[entity].componentIndexes[componentID];
-		if(destructors[componentID])
+		if (componentID >= max_components) {
+			std::vector<std::string> debugInfo = getEntityDebugInfo(entity);
+			size_t len = debugInfo.size();
+			for (uint32_t i = 0; i < len; i++)
+				std::cout << debugInfo[i] << std::endl;
+			throw;
+		}
+		if (destructors[componentID])
 			destructors[componentID](componentID, index);
 		EntityID otherEntity = components[componentID].remove(index);
 		entities[entity].componentIndexes.setInvalid(componentID);
@@ -212,7 +227,7 @@ public:
 		for (auto sys : systems) {
 			clock_t start = clock();
 			sys->run();
-			sys->ms = clock()-start;
+			sys->ms = clock() - start;
 		}
 	}
 	// entity must be valid
@@ -224,6 +239,27 @@ public:
 	}
 	EntityHandle entityGetHandle(EntityID entity) {
 		return *(EntityHandle*)ecs.getEntityComponent(entity, handleComponentID);
+	}
+	std::vector<std::string> getEntityDebugInfo(EntityID entity) {
+		std::vector<std::string> retValue;
+		retValue.push_back("EntityInfo");
+		if(entities.getIsValid(entity)) {
+			retValue.push_back("isAlive");
+		} else {
+			retValue.push_back("isNotAlive");
+		}
+		retValue.push_back("Entity has..");
+		for (uint32_t i = 0; i < max_components; i++) {
+			if (entityHasComponent(entity, i)) {
+				std::string& componentName = components[i].name;
+				std::string line = "";
+				line += std::to_string(i);
+				line += ": ";
+				line += componentName;
+				retValue.push_back(line);
+			}
+		}
+		return retValue;
 	}
 	std::vector<std::string> getDebugInfo() {
 		std::vector<std::string> retValue;
