@@ -65,6 +65,8 @@ extern "C" {
 	void drawText(const char* str, int x, int y, unsigned int fontWidth);
 	void drawRect(int x, int y, int w, int h, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 	void drawBloom(int x, int y, int w, int h, int intensity);
+	void drawPixel(int x, int y, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+	void drawLine(int x1, int y1, int x2, int y2, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 
 	//const uint8_t* getKeyboardState();
 	bool getKeyState(char k);

@@ -32,16 +32,26 @@ public:
 			if(unitAI->hasValidTarget() == false)
 				getNewTarget(unitAI, bodyIDPtr, enemyBodyIDs);
 			if (unitAI->hasValidTarget() == false) {
+				//printf("Not getting new target\n");
 				moveToWaypoint(unitAI, bodyIDPtr);
 				continue;
 			}
+			//printf("Found Target\n");
 			auto pos = physics.getPos<int32_t>(*bodyIDPtr);
+			//static int shootingTick = 20;
 			unitAI->tickFireRate();
-			Health* ownerHealth = (Health*)ecs.getEntityComponent(owner, healthComponentID);
 			if (unitAI->canFire()) {
 				shootIfInRange(unitAI, pos);
+				SystemUtilities::Health* healthPtr = 
+					ecs.getEntityComponentAs<SystemUtilities::Health*>(owner, healthComponentID);
+				std::cout << "team = " << healthPtr->team << std::endl;
+				//shootingTick = 20;
+				unitAI->resetFireTimer();
 			}
+			//shootIfInRange(unitAI, pos);
+			//shootingTick--;
 			moveToWaypoint(unitAI, bodyIDPtr);
+			//moveToTarget(unitAI, bodyIDPtr);
 		}
 	}
 	void getNewTarget(SystemUtilities::UnitAI* unitAI, BodyID* bodyID, const std::vector<BodyID>& enemyBodyIDs) {
@@ -49,6 +59,7 @@ public:
 		BodyID targetBodyID = enemyBodyIDs[0];
 		uint64_t targetDist = (physics.getPos<int32_t>(enemyBodyIDs[0]) - physics.getPos<int32_t>(*bodyID)).getDistanceSquared();
 		for (uint32_t j = 1; j < enemyBodyIDs.size(); j++) {
+			//EntityID otherEntity = (EntityID)physics.getUserData(enemyBodyIDs[j]);
 			if ((physics.getPos<int32_t>(enemyBodyIDs[j]) - physics.getPos<int32_t>(*bodyID)).getDistanceSquared() < targetDist) {
 				targetBodyID = enemyBodyIDs[j];
 			}
@@ -56,20 +67,9 @@ public:
 		unitAI->setTarget((EntityID)physics.getUserData(targetBodyID));
 	}
 	inline std::vector<BodyID> getEnemyBodyIDs(BodyID* bodyID) {
-		std::vector<BodyID> IDs;
-		{
-			Vec2D<int32_t> pos = physics.getPos<int32_t>(*bodyID);
-			Vec2D<int32_t> rangeVec = { maxRange, maxRange };
-			pos -= rangeVec / 2;
-			Vec2D<int32_t> limitVec = physics.getMaxPositions();
-			int32_t limit = limitVec.x;
-			if (limitVec.x < limitVec.y) 
-				limit = limitVec.y;
-			pos.bound(0, limit);
-			rangeVec.bound(0, limit);
-			//TODO: delegate this bounds checking to the below method call
-			IDs = physics.getBodiesInRectRough(pos, rangeVec);
-		}
+		auto pos = physics.getPos<int32_t>(*bodyID);
+		Vec2D<int32_t> rangeVec = { maxRange, maxRange };
+		std::vector<BodyID> IDs = physics.getBodiesInRectRough(pos, rangeVec);
 		std::vector<BodyID> enemyIDs;
 		enemyIDs.reserve(IDs.size());
 		EntityID owner = (EntityID)physics.getUserData(*bodyID);
@@ -87,28 +87,25 @@ public:
 		}
 		return enemyIDs;
 	}
-	inline bool shootIfInRange(SystemUtilities::UnitAI* ownerAI, Vec2D<int32_t> ownerPos) {
+	inline bool shootIfInRange(SystemUtilities::UnitAI* unitAI, Vec2D<int32_t> ownerPos) {
 		//EntityID otherEntity = *(EntityID*)physics.getUserData(otherBodyIDs[j]);
-		EntityID otherEntity = ownerAI->target;
+		EntityID otherEntity = unitAI->target;
 		BodyID* otherBody = (BodyID*)ecs.getEntityComponent(otherEntity, bodyComponentID);
 		Vec2D<int32_t> otherPos = physics.getPos<int32_t>(*otherBody);
 		uint64_t distanceSqr = ownerPos.getDistanceFromSquared(otherPos);
 		if (distanceSqr <= maxShootingRangeSqr) {
-			shoot(*ownerAI, ownerPos, otherPos);
+			Vec2D<int32_t> directionAsInt = ownerPos-otherPos;
+			Vec2D<FixedPoint<>> direction = { directionAsInt.x, directionAsInt.y };
+			direction.normalize();
+			Vec2D<FixedPoint<>> spawnPosFP = Vec2D<FixedPoint<>>{ownerPos.x, ownerPos.y} - (direction * 20);
+			EntityID bullet = SystemUtilities::spawnEntityAt("Entities/Bullet.txt", { (uint32_t)spawnPosFP.x.getAsInt(), (uint32_t)spawnPosFP.y.getAsInt()} );
+			SystemUtilities::MoveToLocation moveTo = { {otherPos.x, otherPos.y}, {1, 1}, 6 };
+			ecs.emplace(bullet, moveToLocationComponentID, &moveTo);
+			//ecs.getEntityComponent(bullet, damage);
+			//SystemUtilities::spawnEntityAt("Entities/Bullet.txt", { (uint32_t)400, (uint32_t)20 });
 			return true;
 		}
 		return false;
-	}
-	inline void shoot(SystemUtilities::UnitAI& ownerAI, 
-		const Vec2D<int32_t>& ownerPos, const Vec2D<int32_t>& otherPos) {
-		ownerAI.resetFireTimer();
-		Vec2D<int32_t> directionAsInt = ownerPos - otherPos;
-		Vec2D<FixedPoint<>> direction = { directionAsInt.x, directionAsInt.y };
-		direction.normalize();
-		Vec2D<FixedPoint<>> spawnPosFP = Vec2D<FixedPoint<>>{ ownerPos.x, ownerPos.y } - (direction * 20);
-		EntityID bullet = SystemUtilities::spawnEntityAt("Entities/Bullet.txt", { (uint32_t)spawnPosFP.x.getAsInt(), (uint32_t)spawnPosFP.y.getAsInt() });
-		SystemUtilities::MoveToLocation moveTo = { {otherPos.x, otherPos.y}, {1, 1}, 6 };
-		ecs.emplace(bullet, moveToLocationComponentID, &moveTo);
 	}
 	inline void moveToWaypoint(SystemUtilities::UnitAI* unitAI, BodyID* bodyID) {
 		//continue;
@@ -126,7 +123,7 @@ public:
 		physics.setVelocity(*bodyID, vel.x, vel.y);
 	}
 	inline void moveToTarget(SystemUtilities::UnitAI* unitAI, BodyID* bodyID) {
-		std::cout << "moving to target" << std::endl;
+		std::cout << "hit" << std::endl;
 		BodyID targetBodyID = *(BodyID*)ecs.getEntityComponent(unitAI->target, bodyComponentID);
 		//unitAI->moveTo.pos = physics.getPos<uint32_t>(targetBodyID);
 		Vec2D<uint32_t> ownerPos = physics.getPos<uint32_t>(*bodyID);

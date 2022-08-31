@@ -151,6 +151,7 @@ public:
 		std::vector<BodyID> retValue;
 
 
+
 		auto hashes = spatialHashTable.getHashes(pos, siz);
 		for (auto* hash : hashes) {
 			uint32_t hashSize = hash->count;
@@ -166,6 +167,11 @@ public:
 		}
 
 		return retValue;
+	}
+
+	Vec2D<int32_t> getMaxPositions() {
+		constexpr int32_t ceil = 2000 * 128 * unit_size;
+		return { ceil, ceil };
 	}
 
 	void addVelocity(BodyID id, float vx, float vy) {

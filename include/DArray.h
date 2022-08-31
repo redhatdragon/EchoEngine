@@ -25,7 +25,7 @@ public:
 		dataHeader->count = size;
 	}
 	void free() {
-		free(dataHeader);
+		::free(dataHeader);
 	}
 	T& operator[](size_t index) {
 		return dataHeader->data[index];

@@ -1,0 +1,15 @@
+/#
+Notes: This file is loaded runtime and layout may change as our utility AI evolves.
+So far only components of type array with exactly two elements may be used.
+#/ 
+
+#[dist, rating] : [int, int]
+
+chaseEnemyIfInRange = [700, 1000];
+shootIfEnemyInRange = [400, 2000];
+retreatIfHealthLessThan = [50, 10000];
+
+# Values that are rated based on the above
+# chase
+# shoot
+# retreat

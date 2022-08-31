@@ -313,6 +313,16 @@ public:
 	__forceinline void clear() {
 		count = 0;
 	}
+	__forceinline uint32_t findFirst(T _data) {
+		for (uint32_t i = 0; i < count; i++)
+			if (data[index] == _data) return i;
+		return -1;
+	}
+	__forceinline bool has(T _data) {
+		for (uint32_t i = 0; i < count; i++)
+			if (data[index] == _data) return true;
+		return false;
+	}
 };
 
 

@@ -89,6 +89,16 @@ void drawRect(int x, int y, int w, int h, uint8_t r, uint8_t g, uint8_t b, uint8
 
 	//SDL_DestroyTexture(texture);
 }
+void drawPixel(int x, int y, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+	SDL_SetRenderDrawColor(renderer, r, g, b, a);
+	SDL_RenderDrawPoint(renderer, x, y);
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+}
+void drawLine(int x1, int y1, int x2, int y2, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+	SDL_SetRenderDrawColor(renderer, r, g, b, a);
+	SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+}
 
 bool getKeyState(char k) {
 	return keys[k+(SDL_SCANCODE_A - 'a')];

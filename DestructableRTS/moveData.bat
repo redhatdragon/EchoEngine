@@ -1,0 +1,1 @@
+xcopy data out\build\data /E /H /C /R /Q /Y /I

@@ -20,16 +20,16 @@ struct Vec2D {
 		x = (x * num);
 		y = (y * num);
 	}
-	__forceinline Vec2D<T> operator+(Vec2D& other) {
+	__forceinline Vec2D<T> operator+(const Vec2D& other) const {
 		return { x + other.x, y + other.y };
 	}
-	__forceinline Vec2D<T> operator-(Vec2D& other) {
+	__forceinline Vec2D<T> operator-(const Vec2D& other) const {
 		return { x - other.x, y - other.y };
 	}
-	__forceinline Vec2D<T> operator/(T num) {
+	__forceinline Vec2D<T> operator/(const T num) const {
 		return { x / num, y / num };
 	}
-	__forceinline Vec2D<T> operator*(T num) {
+	__forceinline Vec2D<T> operator*(const T num) const {
 		return { x * num, y * num };
 	}
 	__forceinline bool isZero() {
@@ -45,11 +45,27 @@ struct Vec2D {
 		}
 		x /= dist / unit; y /= dist / unit;
 	}
+	__forceinline void floor(T value) {
+		if (x < value) x = value;
+		if (y < value) y = value;
+	}
+	__forceinline void ceil(T value) {
+		if (x > value) x = value;
+		if (y > value) y = value;
+	}
+	__forceinline void bound(T floor, T ceil) {
+		if (x < floor) x = floor;
+		if (x > ceil) x = ceil;
+		if (y < floor) y = floor;
+		if (y > ceil) y = ceil;
+	}
 	__forceinline T getDistance() {
 		return sqrt((x * x) + (y * y));
 	}
 	__forceinline uint64_t getDistanceSquared() {
-		return (x * x) + (y * y);
+		int64_t retValue = (x * x) + (y * y);
+		if (retValue < 0) return -retValue;
+		return retValue;
 	}
 	__forceinline T getDistanceFrom(Vec2D& other) {
 		return (*this - other).getDistance();

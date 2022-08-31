@@ -14,7 +14,7 @@ add_executable(EchoLevelEditor
 	#Systems/systemPlayer.cpp
 	#Systems/systems.cpp
 	#IO_API/SDL2/ThreadPool.cpp
-)
+ "UI/ArrowButton.h" "UI/UIUtility.h" "UI/TextBox.cpp" "UI/ArrowButton.cpp" "UI/TextFieldUint.cpp")
 
 target_include_directories(EchoLevelEditor PRIVATE
 	../include
