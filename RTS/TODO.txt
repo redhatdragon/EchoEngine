@@ -9,4 +9,5 @@ IO
 *Consider adding 2D lighting and shadows
 
 PATHFINDING
-*Decide on ideal pathing strategies to impliment for large scale games/demos
+*Impliment a extensable or custom flowfield pathing system.
+	-ref: https://www.jdxdev.com/blog/2020/05/03/flowfields/
