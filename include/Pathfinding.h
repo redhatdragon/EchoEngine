@@ -2,37 +2,43 @@
 #include "FlatBuffer.h"
 #include "Vec.h"
 
-typedef uint32_t AStarSubjectID;
-typedef uint32_t AStarWaypointID;
+typedef uint16_t PathfindingSubjectID;
+typedef uint32_t PathfindingWaypointID;
 
-template<uint32_t widthCount, uint32_t heightCount, uint32_t sizePerNode>
-class AStar {
+template<uint32_t width_count, uint32_t height_count, uint32_t size_per_tile, uint32_t max_per_tile = 16>
+class Pathfinding {
+	struct Tile {
+		FlatBuffer<PathfindingSubjectID, max_per_tile> IDs;
+		uint16_t loadIncoming[8];
+	};
 	struct Layer {
-		FlatBuffer<FlatBuffer<AStarSubjectID, 32>, widthCount * heightCount> hashes;
-		__forceinline void place(AStarSubjectID id, const Vec2D<uint32_t>& pos, const Vec2D<uint32_t>& siz) {
+		FlatBuffer<Tile, width_count* height_count> tiles;
+		__forceinline void place(PathfindingSubjectID id, const Vec2D<uint32_t>& pos, const Vec2D<uint32_t>& siz) {
 			Vec2D<uint32_t> start, end;
-			start = pos; start /= sizePerNode;
-			end = pos; end += siz; end /= sizePerNode;
+			start = pos; start /= size_per_tile;
+			end = pos; end += siz; end /= size_per_tile;
 			for (uint32_t x = start.x; x < end.x; x++) {
 				for (uint32_t y = start.y; y < end.y; y++) {
-					if (hashes[x + y * widthCount].count == 32) {
-						std::cout << "Error: AStar::Layer::place() failed, hash has too many members" << std::endl;
+					if (tiles[x + y * width_count].IDs.count == max_per_tile) {
+						std::cout << "Error: PathFinding::Layer::place() failed, tile has too many members" << std::endl;
 						throw;
 					}
-					hashes[x + y * widthCount].push(id);
+					tiles[x + y * width_count].push(id);
 				}
 			}
 		}
 	};
 	Layer layer;
-	AStarSubjectID lastSubject;
+	PathfindingSubjectID lastSubject;
 public:
 	__forceinline void init() {
 		lastSubject = 0;  // first subject starts at 1 
 	}
-	__forceinline AStarSubjectID subscribe(const Vec2D<uint32_t>& pos, const Vec2D<uint32_t>& siz) {
+	__forceinline PathfindingSubjectID subscribe(const Vec2D<uint32_t>& pos, const Vec2D<uint32_t>& siz) {
 		lastSubject++;
 		layer.place(lastSubject, pos, siz);
 		return lastSubject;
 	}
 };
+
+int x = sizeof(Pathfinding<1000, 1000, 32>);

@@ -15,3 +15,7 @@ RUNTIME SPECS
 *10ms reserved for engine, systems, and game logic
 *2ms reserved for asset streaming
 *4ms reserved for rendering
+*65k max game objects/entities "potential"
+*5k min game object/entities
+	-3k units/buildings
+	-2k projectiles
