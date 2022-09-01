@@ -1,0 +1,13 @@
+PHYSICS
+*Consider best approach to add static bodies
+*Decide on an ideal approach to calculate overlapping body data
+when considering static bodies
+*Consider optimizing for enabling optional multithreading, maybe for the detection phase at least
+*Figure out best way to get last valid element index from FlatFlaggedBuffer<BodyID, max_bodies> bodies;
+
+IO
+*Fix threadpooling
+*Consider adding 2D lighting and shadows
+
+PATHFINDING
+*Decide on ideal pathing strategies to impliment for large scale games/demos

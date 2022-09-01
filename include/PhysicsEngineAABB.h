@@ -263,7 +263,7 @@ public:
 					continue;
 				if (bodies[i].collidesWith(bodies[IDs[j].id])) {
 					overlappingBodyPushIfUnique(i, IDs[j]);
-					overlappingBodyPushIfUnique(IDs[j].id, { i });
+					//overlappingBodyPushIfUnique(IDs[j].id, { i });
 				}
 			}
 			if (validBodyCount >= bodyCount) break;
