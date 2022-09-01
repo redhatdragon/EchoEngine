@@ -191,6 +191,26 @@ void stressTesting1() {
 
 
 
+void stressTesting2() {
+	SystemUtilities::spawnEntityAtWithSize("Entities/Killzone.txt", { 0, 0 }, { 2000, 20 });
+	SystemUtilities::spawnEntityAtWithSize("Entities/Killzone.txt", { 0, 0 }, { 20, 2000 });
+	SystemUtilities::spawnEntityAtWithSize("Entities/Killzone.txt", { 2000 - 20, 0 }, { 20, 2000 });
+	SystemUtilities::spawnEntityAtWithSize("Entities/Killzone.txt", { 0, 2000 - 20 }, { 2000, 20 });
+
+	for (uint32_t i = 0; i < 1000; i++) {
+		EntityID factory1 = buildFactory(64, 256 + i * 52, 1, "Entities/Factory.txt");
+		EntityID factory2 = buildFactory(512, 256 + i * 52, 2, "Entities/Factory.txt");
+		setFactoryWaypoint(factory1, (512 - 64) / 2, 256);
+		setFactoryWaypoint(factory2, (512 - 64) / 2, 256);
+		addQueToFactory(factory1, "solder");
+		addQueToFactory(factory1, "solder");
+		addQueToFactory(factory2, "solder");
+		addQueToFactory(factory2, "solder");
+	}
+}
+
+
+
 void appStart() {
 	profileLinesStart();
 	initSystems();
@@ -200,21 +220,7 @@ void appStart() {
 	testVec2D();
 	//return;
 
-	SystemUtilities::spawnEntityAtWithSize("Entities/Killzone.txt", { 0, 0 }, { 2000, 20 });
-	SystemUtilities::spawnEntityAtWithSize("Entities/Killzone.txt", { 0, 0 }, { 20, 2000 });
-	SystemUtilities::spawnEntityAtWithSize("Entities/Killzone.txt", { 2000-20, 0 }, { 20, 2000 });
-	SystemUtilities::spawnEntityAtWithSize("Entities/Killzone.txt", { 0, 2000-20 }, { 2000, 20 });
-
-	for (uint32_t i = 0; i < 100; i++) {
-		EntityID factory1 = buildFactory(64, 256+i*52, 1, "Entities/Factory.txt");
-		EntityID factory2 = buildFactory(512, 256+i*52, 2, "Entities/Factory.txt");
-		setFactoryWaypoint(factory1, (512 - 64) / 2, 256);
-		setFactoryWaypoint(factory2, (512 - 64) / 2, 256);
-		addQueToFactory(factory1, "solder");
-		addQueToFactory(factory1, "solder");
-		addQueToFactory(factory2, "solder");
-		addQueToFactory(factory2, "solder");
-	}
+	stressTesting1();
 
 	/*EntityID factory1 = buildFactory(64, 256, 1, "Entities/Factory.txt");
 	EntityID factory2 = buildFactory(512, 256, 2, "Entities/Factory.txt");
