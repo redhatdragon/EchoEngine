@@ -214,6 +214,7 @@ public:
 		return timeFromStepping;
 	}
 
+	uint32_t lastBodyIndex;
 	inline void simulate() {
 		uint32_t bodyCount = bodies.getCount();
 		if (bodyCount == 0) return;
@@ -223,36 +224,33 @@ public:
 				continue;
 			validBodyCount++;
 			if (bodies[i].vel.isZero()) {
-				if (validBodyCount >= bodyCount) break;
+				if (validBodyCount >= bodyCount) {
+					lastBodyIndex = i;
+					break;
+				}
 				continue;
 			}
 			spatialHashTable.removeBody({ i }, bodies[i].pos, bodies[i].siz);
 			bodies[i].simulate();
 			spatialHashTable.addBody({ i }, bodies[i].pos, bodies[i].siz);
-			if (validBodyCount >= bodyCount) break;
+			if (validBodyCount >= bodyCount) {
+				lastBodyIndex = i;
+				break;
+			}
 		}
 	}
 	inline void detect() {
 		uint32_t bodyCount = bodies.getCount();
 		if (bodyCount == 0) return;
-		uint32_t validBodyCount = 0;
-		for (uint32_t i = 0; true; i++) {
+		for (uint32_t i = 0; i <= lastBodyIndex; i++) {
 			if (bodies.getIsValid(i) == false)
 				continue;
-			validBodyCount++;
 			overlappingBodyIDs[i].clear();
-			if (validBodyCount >= bodyCount) break;
 		}
-		validBodyCount = 0;
 
-		for (uint32_t i = 0; true; i++) {
+		for (uint32_t i = 0; i <= lastBodyIndex; i++) {
 			if (bodies.getIsValid(i) == false)
 				continue;
-			validBodyCount++;
-			/*if (bodies[i].vel.isZero()) {
-				if (validBodyCount >= bodyCount) break;
-				continue;
-			}*/
 
 			static std::vector<BodyID> IDs;
 			IDs.resize(0);
@@ -266,24 +264,20 @@ public:
 					//overlappingBodyPushIfUnique(IDs[j].id, { i });
 				}
 			}
-			if (validBodyCount >= bodyCount) break;
 		}
 	}
 	inline void resolve() {
 		uint32_t bodyCount = bodies.getCount();
 		if (bodyCount == 0) return;
-		uint32_t validBodyCount = 0;
-		for (uint32_t i = 0; true; i++) {
+		for (uint32_t i = 0; i <= lastBodyIndex; i++) {
 			if (bodies.getIsValid(i) == false)
 				continue;
-			validBodyCount++;
 			if (overlappingBodyIDs[i].count && bodies[i].vel.isZero() == false && bodies[i].solid
 				&& areAnyOverlappingBodiesSolid(i) == true) {
 				spatialHashTable.removeBody({ i }, bodies[i].pos, bodies[i].siz);
 				bodies[i].reverseSimulate();
 				spatialHashTable.addBody({ i }, bodies[i].pos, bodies[i].siz);
 			}
-			if (validBodyCount >= bodyCount) break;
 		}
 	}
 

@@ -3,7 +3,6 @@ PHYSICS
 *Decide on an ideal approach to calculate overlapping body data
 when considering static bodies
 *Consider optimizing for enabling optional multithreading, maybe for the detection phase at least
-*Figure out best way to get last valid element index from FlatFlaggedBuffer<BodyID, max_bodies> bodies;
 
 IO
 *Fix threadpooling
