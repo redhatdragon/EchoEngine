@@ -10,7 +10,14 @@
 #include <EntityObjectLoader.h>
 
 DDECS<24, 100008> ecs;
-PhysicsEngine physics;
+//PhysicsEngine<2000, 2000, 128> physics;
+PhysicsEngine<512/2, 512/2, 128> physics;
+Pathfinding<512*2, 512*2, 32> pathfinding;
+
+constexpr uint32_t sizeOfECS = sizeof(ecs);
+constexpr uint32_t sizeOfPhysics = sizeof(physics);
+constexpr uint32_t sizeOfPathfinding = sizeof(pathfinding);
+constexpr uint32_t bytesUsed = sizeOfECS + sizeOfPhysics + sizeOfPathfinding;
 
 
 
@@ -220,7 +227,7 @@ void appStart() {
 	testVec2D();
 	//return;
 
-	stressTesting1();
+	stressTesting2();
 
 	/*EntityID factory1 = buildFactory(64, 256, 1, "Entities/Factory.txt");
 	EntityID factory2 = buildFactory(512, 256, 2, "Entities/Factory.txt");

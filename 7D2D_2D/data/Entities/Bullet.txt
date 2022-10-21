@@ -1,0 +1,9 @@
+#Reserved components for the level editor
+size = [8, 8];
+getTexture = "Textures/Bullet.png";
+
+#User defined components for the game
+destructOnOverlap = NULL;
+
+#{team, base, {TRUE, AP, EXPLOSIVE, BALISTIC}}
+damageOnCollision = [0,2.0f,   0.0f,0.2f,0.1f,1.0f];

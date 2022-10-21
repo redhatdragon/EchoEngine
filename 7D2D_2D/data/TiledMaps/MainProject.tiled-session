@@ -1,0 +1,27 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "",
+    "expandedProjectPaths": [
+    ],
+    "file.lastUsedOpenFilter": "All Files (*)",
+    "fileStates": {
+    },
+    "map.fixedSize": true,
+    "map.height": 64,
+    "map.orientation": 1,
+    "map.tileHeight": 64,
+    "map.tileWidth": 64,
+    "map.width": 64,
+    "openFiles": [
+    ],
+    "project": "",
+    "property.type": "string",
+    "recentFiles": [
+    ],
+    "tileset.embedInMap": false,
+    "tileset.lastUsedFilter": "All Files (*)",
+    "tileset.type": 1
+}

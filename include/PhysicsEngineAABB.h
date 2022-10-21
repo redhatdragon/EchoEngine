@@ -31,7 +31,7 @@ struct BodyID {
 	}
 };
 
-template<uint32_t width, uint32_t height, uint32_t hashWidth, uint32_t max_bodies_per_hash = 64>
+template<uint32_t width, uint32_t height, uint32_t hash_width, uint32_t max_bodies_per_hash = 64>
 class SpatialHashTable {
 	FlatBuffer<BodyID, max_bodies_per_hash> hash[width * height];
 	void addBodyToHash(BodyID id, uint32_t index) {
@@ -50,15 +50,15 @@ class SpatialHashTable {
 	}
 public:
 	void addBody(BodyID id, const Vec2D<int32_t>& pos, const Vec2D<int32_t>& siz) {
-		uint32_t startRight = pos.x / hashWidth, startDown = pos.y / hashWidth;
-		uint32_t endRight = (pos.x + siz.x) / hashWidth, endDown = (pos.y + siz.y) / hashWidth;
+		uint32_t startRight = pos.x / hash_width, startDown = pos.y / hash_width;
+		uint32_t endRight = (pos.x + siz.x) / hash_width, endDown = (pos.y + siz.y) / hash_width;
 		for (uint32_t y = startDown; y <= endDown; y++)
 			for (uint32_t x = startRight; x <= endRight; x++)
 				addBodyToHash(id, x + y * width);
 	}
 	void removeBody(BodyID id, const Vec2D<int32_t>& pos, const Vec2D<int32_t>& siz) {
-		uint32_t startRight = pos.x / hashWidth, startDown = pos.y / hashWidth;
-		uint32_t endRight = (pos.x + siz.x) / hashWidth, endDown = (pos.y + siz.y) / hashWidth;
+		uint32_t startRight = pos.x / hash_width, startDown = pos.y / hash_width;
+		uint32_t endRight = (pos.x + siz.x) / hash_width, endDown = (pos.y + siz.y) / hash_width;
 		for (uint32_t y = startDown; y <= endDown; y++)
 			for (uint32_t x = startRight; x <= endRight; x++)
 				removeBodyFromHash(id, x + y * width);
@@ -72,8 +72,8 @@ public:
 	}
 	__forceinline std::vector< FlatBuffer<BodyID, max_bodies_per_hash>*> getHashes(Vec2D<int32_t>& pos, Vec2D<int32_t>& siz) {
 		std::vector< FlatBuffer<BodyID, max_bodies_per_hash>*> returnValue;
-		uint32_t startRight = pos.x / hashWidth, startDown = pos.y / hashWidth;
-		uint32_t endRight = (pos.x + siz.x) / hashWidth, endDown = (pos.y + siz.y) / hashWidth;
+		uint32_t startRight = pos.x / hash_width, startDown = pos.y / hash_width;
+		uint32_t endRight = (pos.x + siz.x) / hash_width, endDown = (pos.y + siz.y) / hash_width;
 		for (uint32_t y = startDown; y <= endDown; y++)
 			for (uint32_t x = startRight; x <= endRight; x++)
 				returnValue.push_back(&hash[x + y * width]);
@@ -81,8 +81,8 @@ public:
 	}
 	// This was complicated and may need another look over
 	void getIDs(const Vec2D<int32_t>& pos, const Vec2D<int32_t>& siz, std::vector<BodyID>& returnValue) {
-		uint32_t startRight = pos.x / hashWidth, startDown = pos.y / hashWidth;
-		uint32_t endRight = (pos.x + siz.x) / hashWidth, endDown = (pos.y + siz.y) / hashWidth;
+		uint32_t startRight = pos.x / hash_width, startDown = pos.y / hash_width;
+		uint32_t endRight = (pos.x + siz.x) / hash_width, endDown = (pos.y + siz.y) / hash_width;
 		for (uint32_t y = startDown; y <= endDown; y++) {
 			for (uint32_t x = startRight; x <= endRight; x++) {
 				auto len = hash[x + y * width].count;
@@ -105,6 +105,7 @@ public:
 	}
 };
 
+template<uint32_t width, uint32_t height, uint32_t hash_width, uint32_t max_bodies_per_hash = 64>
 class PhysicsEngine {
 	static constexpr uint32_t max_bodies = 100000;
 	static constexpr uint32_t unit_size = 256;  //used as a pretend "1" normalized value to emulate decimal
@@ -112,7 +113,7 @@ class PhysicsEngine {
 	FlatBuffer<void*, max_bodies> userData;
 	FlatBuffer<FlatBuffer<BodyID, 100>, max_bodies> overlappingBodyIDs;
 	//SpatialHashTable<300, 300, 128*unit_size> spatialHashTable;
-	SpatialHashTable<2000, 2000, 128 * unit_size> spatialHashTable;
+	SpatialHashTable<width, height, hash_width* unit_size, max_bodies_per_hash> spatialHashTable;
 	float timeFromStepping = 0;
 public:
 	void init() {

@@ -315,12 +315,12 @@ public:
 	}
 	__forceinline uint32_t findFirst(T _data) {
 		for (uint32_t i = 0; i < count; i++)
-			if (data[index] == _data) return i;
+			if (data[i] == _data) return i;
 		return -1;
 	}
 	__forceinline bool has(T _data) {
 		for (uint32_t i = 0; i < count; i++)
-			if (data[index] == _data) return true;
+			if (data[i] == _data) return true;
 		return false;
 	}
 };

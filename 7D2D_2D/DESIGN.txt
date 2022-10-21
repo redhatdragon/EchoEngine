@@ -1,0 +1,21 @@
+RUNTIME SPECS
+*16ms total alloted time between ticks/frames
+*Ticks and frames are synced unless frame skipping is required
+	-no delta time variations for physics or game logic
+*Multithreading permitted and expected
+	-no async systems/modules logic!
+	-only one thing/module (piece of logic) such as a game system
+	may be multithreaded at a time!
+	-attempt to reserve just 90% time of all CPU cores
+	-requires fine tuned custom thread pooling
+*1.9GB system memory will be used for the entire game
+*1.7GB system memory reserved for engine, systems, and game logic
+*0.2GB system memory reserved for assets
+*0.25GB video memory reserved for assets
+*10ms reserved for engine, systems, and game logic
+*2ms reserved for asset streaming
+*4ms reserved for rendering
+*65k max game objects/entities "potential"
+*5k min game object/entities
+	-3k units/buildings
+	-2k projectiles
