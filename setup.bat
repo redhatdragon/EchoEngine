@@ -6,4 +6,5 @@ git clone https://github.com/libsdl-org/SDL_ttf SDL2_ttf
 cd SDL2_ttf/external
 git clone https://github.com/freetype/freetype freetype
 cd ../../
+cmake ./
 cd ../
