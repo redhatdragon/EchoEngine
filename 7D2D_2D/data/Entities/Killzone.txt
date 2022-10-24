@@ -1,6 +1,0 @@
-#Reserved components for the level editor
-
-#User defined components for the game
-
-#{team, base, {TRUE, AP, EXPLOSIVE, BALISTIC}}
-damageOnCollision = [0,1000000.0f,   1.0f,1.0f,1.0f,1.0f];
