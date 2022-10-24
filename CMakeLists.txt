@@ -11,22 +11,6 @@ add_library(EchoEngine STATIC
 	IO_API/GUI/GUI.c
 )
 
-execute_process(
-     COMMAND ${GIT_EXECUTABLE} clone https://github.com/libsdl-org/SDL SDL2
-     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/deps/
-)
-execute_process(
-     COMMAND ${GIT_EXECUTABLE} clone https://github.com/libsdl-org/SDL_image SDL2_image
-     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/deps/
-)
-execute_process(
-     COMMAND ${GIT_EXECUTABLE} clone https://github.com/libsdl-org/SDL_ttf SDL2_ttf
-     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/deps/
-)
-execute_process(
-     COMMAND ${GIT_EXECUTABLE} clone https://github.com/freetype/freetype freetype
-     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/deps/SDL2_ttf/external
-)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/SDL2)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/SDL2_image)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/SDL2_ttf)
