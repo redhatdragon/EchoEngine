@@ -12,7 +12,7 @@ Under chaotic development at the moment, this is still in it's baby steps, pleas
 
 
 ## INSTALL
-*Clone/download EchoEngineExample repo: https://github.com/redhatdragon/EchoEngineExampleProjects
+* Clone/download EchoEngineExample repo: https://github.com/redhatdragon/EchoEngineExampleProjects
 
 * (Optional) copy ./blank to wherever you'd like
 
