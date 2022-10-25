@@ -6,7 +6,7 @@ add_library(EchoEngine STATIC
 	Widget.cpp
 	Name.cpp
 	profiler.cpp
-	deps/BitBool/BitBool.cpp
+	BitBool/BitBool.cpp
 	IO_API/IO_API.c
 	IO_API/GUI/GUI.c
 )
