@@ -41,7 +41,7 @@ add_custom_command(TARGET EchoEngine POST_BUILD
         #$<TARGET_FILE_DIR:EchoEngine>/../
 		"${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}"
 )
-add_custom_command(TARGET app POST_BUILD
+add_custom_command(TARGET EchoEngine POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_BINARY_DIR}/deps/SDL2_ttf/${CMAKE_BUILD_TYPE}"
         #$<TARGET_FILE_DIR:EchoEngine>/../
