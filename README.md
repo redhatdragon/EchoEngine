@@ -23,6 +23,8 @@ Under chaotic development at the moment, this is still in it's baby steps, pleas
 
 
 # Design
+* Plug and play, and portable!  Ideally this should work under any hardware under the sun so long as it at least supports C++ compilation, without hassle from you the end user.  All engine modules will be painstakingly designed to be portable as possible, using fallbacks if necessary, throwing warnings over anything of note if necessary.
+
 * Structured as data oriented AND data driven as possible, intending to support immense flexability to game logic with runtimes we can be proud of.  Why must we be so restrictive on the end user?
 
 * Light weight, we want to avoid object bloat as much as possible.  It helps networking and overall throughput.
