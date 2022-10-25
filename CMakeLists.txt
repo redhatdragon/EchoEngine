@@ -31,19 +31,22 @@ target_link_libraries(EchoEngine
 
 add_custom_command(TARGET EchoEngine POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_BINARY_DIR}/deps/SDL2/${CMAKE_BUILD_TYPE}"
-        #$<TARGET_FILE_DIR:EchoEngine>/../
-		"${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}"
+		# "${CMAKE_BINARY_DIR}/deps/SDL2/${CMAKE_BUILD_TYPE}"
+		$<TARGET_FILE_DIR:EchoEngine>/../deps/SDL2/${CMAKE_BUILD_TYPE}
+		$<TARGET_FILE_DIR:EchoEngine>/../
+		#"${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}"
 )
 add_custom_command(TARGET EchoEngine POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_BINARY_DIR}/deps/SDL2_image/${CMAKE_BUILD_TYPE}"
-        #$<TARGET_FILE_DIR:EchoEngine>/../
-		"${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}"
+		#"${CMAKE_BINARY_DIR}/deps/SDL2_image/${CMAKE_BUILD_TYPE}"
+		$<TARGET_FILE_DIR:EchoEngine>/../deps/SDL2_image/${CMAKE_BUILD_TYPE}
+		$<TARGET_FILE_DIR:EchoEngine>/../
+		#"${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}"
 )
 add_custom_command(TARGET EchoEngine POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_BINARY_DIR}/deps/SDL2_ttf/${CMAKE_BUILD_TYPE}"
-        #$<TARGET_FILE_DIR:EchoEngine>/../
-		"${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}"
+		#"${CMAKE_BINARY_DIR}/deps/SDL2_ttf/${CMAKE_BUILD_TYPE}"
+		$<TARGET_FILE_DIR:EchoEngine>/../deps/SDL2_ttf/${CMAKE_BUILD_TYPE}
+		$<TARGET_FILE_DIR:EchoEngine>/../
+		#"${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}"
 )
