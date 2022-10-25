@@ -15,8 +15,6 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/SDL2)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/SDL2_image)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/SDL2_ttf)
 target_include_directories(EchoEngine PRIVATE
-	#../include
-	#include
 	deps
 	deps/SDL2/include
 	${CMAKE_CURRENT_SOURCE_DIR}
@@ -27,4 +25,25 @@ target_link_libraries(EchoEngine
 	SDL2_ttf
 	SDL2main
 	#SDL2-static
+)
+
+
+
+add_custom_command(TARGET EchoEngine POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_BINARY_DIR}/deps/SDL2/${CMAKE_BUILD_TYPE}"
+        #$<TARGET_FILE_DIR:EchoEngine>/../
+		"${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}"
+)
+add_custom_command(TARGET EchoEngine POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_BINARY_DIR}/deps/SDL2_image/${CMAKE_BUILD_TYPE}"
+        #$<TARGET_FILE_DIR:EchoEngine>/../
+		"${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}"
+)
+add_custom_command(TARGET app POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_BINARY_DIR}/deps/SDL2_ttf/${CMAKE_BUILD_TYPE}"
+        #$<TARGET_FILE_DIR:EchoEngine>/../
+		"${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}"
 )
