@@ -1,7 +1,13 @@
 ## ECHO ENGINE
+
 Welcome to a data oriented and painstakingly crafted engine.  There's a lot of reasons to consider using this engine as it evolves over time.  Though in spirit taking elements from raw low level game frameworks, it'll be gradually crafted into an easy plug and play tool hopefully almost anyone could benefit from.
 
 Be of good cheer! o7
+
+
+
+## WARNING: under construction...
+Under chaotic development at the moment, this is still in it's baby steps, please have a little patience, it'll get ironed out hopefully soon.
 
 
 
