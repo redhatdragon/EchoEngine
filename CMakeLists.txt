@@ -11,6 +11,9 @@ add_library(EchoEngine STATIC
 	IO_API/GUI/GUI.c
 )
 
+set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}")
+set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}")
+
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/SDL2)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/SDL2_image)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/SDL2_ttf)
@@ -29,24 +32,66 @@ target_link_libraries(EchoEngine
 
 
 
-add_custom_command(TARGET EchoEngine POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-		# "${CMAKE_BINARY_DIR}/deps/SDL2/${CMAKE_BUILD_TYPE}"
-		$<TARGET_FILE_DIR:EchoEngine>/../deps/SDL2/${CMAKE_BUILD_TYPE}
-		$<TARGET_FILE_DIR:EchoEngine>/../
-		#"${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}"
-)
-add_custom_command(TARGET EchoEngine POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-		#"${CMAKE_BINARY_DIR}/deps/SDL2_image/${CMAKE_BUILD_TYPE}"
-		$<TARGET_FILE_DIR:EchoEngine>/../deps/SDL2_image/${CMAKE_BUILD_TYPE}
-		$<TARGET_FILE_DIR:EchoEngine>/../
-		#"${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}"
-)
-add_custom_command(TARGET EchoEngine POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-		#"${CMAKE_BINARY_DIR}/deps/SDL2_ttf/${CMAKE_BUILD_TYPE}"
-		$<TARGET_FILE_DIR:EchoEngine>/../deps/SDL2_ttf/${CMAKE_BUILD_TYPE}
-		$<TARGET_FILE_DIR:EchoEngine>/../
-		#"${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}"
-)
+#IF (WIN32)
+#	add_custom_command(TARGET EchoEngine POST_BUILD
+#	COMMAND xcopy /s /d /y 
+#		#"\"$<TARGET_FILE_DIR:EchoEngine>/../deps/SDL2/$<CONFIG>\""
+#		#"\"$<TARGET_FILE_DIR:EchoEngine>/../*\""
+#		"\"${CMAKE_BINARY_DIR}/deps/SDL2/$<CONFIG>\""
+#		"\"${CMAKE_BINARY_DIR}/*\""
+#)
+#add_custom_command(TARGET EchoEngine POST_BUILD
+#	COMMAND xcopy /s /d /y 
+#		#"\"$<TARGET_FILE_DIR:EchoEngine>/../deps/SDL2_image/$<CONFIG>\""
+#		#"\"$<TARGET_FILE_DIR:EchoEngine>/../*\""
+#		"\"${CMAKE_BINARY_DIR}/deps/SDL2_image/$<CONFIG>\""
+#		"\"${CMAKE_BINARY_DIR}/*\""
+#)
+#add_custom_command(TARGET EchoEngine POST_BUILD
+#	COMMAND xcopy /s /d /y 
+#		#"\"$<TARGET_FILE_DIR:EchoEngine>/../deps/SDL2_ttf/$<CONFIG>\""
+#		#"\"$<TARGET_FILE_DIR:EchoEngine>/../*\""
+#		"\"${CMAKE_BINARY_DIR}/deps/SDL2_ttf/$<CONFIG>\""
+#		"\"${CMAKE_BINARY_DIR}/*\""
+#)
+#ELSE()
+#	add_custom_command(TARGET EchoEngine POST_BUILD
+#	COMMAND cp -u 
+#		"\"$<TARGET_FILE_DIR:EchoEngine>/../deps/SDL2/$<CONFIG>\""
+#		"\"$<TARGET_FILE_DIR:EchoEngine>/../*\""
+#)
+#add_custom_command(TARGET EchoEngine POST_BUILD
+#	COMMAND cp -u 
+#		"\"$<TARGET_FILE_DIR:EchoEngine>/../deps/SDL2_image/$<CONFIG>\""
+#		"\"$<TARGET_FILE_DIR:EchoEngine>/../*\""
+#)
+#add_custom_command(TARGET EchoEngine POST_BUILD
+#	COMMAND cp -u 
+#		"\"$<TARGET_FILE_DIR:EchoEngine>/../deps/SDL2_ttf/$<CONFIG>\""
+#		"\"$<TARGET_FILE_DIR:EchoEngine>/../*\""
+#)
+#ENDIF()
+
+
+
+#add_custom_command(TARGET EchoEngine POST_BUILD
+#    COMMAND ${CMAKE_COMMAND} -E copy_directory
+#		# "${CMAKE_BINARY_DIR}/deps/SDL2/${CMAKE_BUILD_TYPE}"
+#		$<TARGET_FILE_DIR:EchoEngine>/../deps/SDL2/${CMAKE_BUILD_TYPE}
+#		$<TARGET_FILE_DIR:EchoEngine>/../
+#		#"${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}"
+#)
+#add_custom_command(TARGET EchoEngine POST_BUILD
+#    COMMAND ${CMAKE_COMMAND} -E copy_directory
+#		#"${CMAKE_BINARY_DIR}/deps/SDL2_image/${CMAKE_BUILD_TYPE}"
+#		$<TARGET_FILE_DIR:EchoEngine>/../deps/SDL2_image/${CMAKE_BUILD_TYPE}
+#		$<TARGET_FILE_DIR:EchoEngine>/../
+#		#"${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}"
+#)
+#add_custom_command(TARGET EchoEngine POST_BUILD
+#    COMMAND ${CMAKE_COMMAND} -E copy_directory
+#		#"${CMAKE_BINARY_DIR}/deps/SDL2_ttf/${CMAKE_BUILD_TYPE}"
+#		$<TARGET_FILE_DIR:EchoEngine>/../deps/SDL2_ttf/${CMAKE_BUILD_TYPE}
+#		$<TARGET_FILE_DIR:EchoEngine>/../
+#		#"${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}"
+#)
