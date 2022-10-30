@@ -1,30 +1,16 @@
-#pragma once
+#ifndef PHYSICS_GUARD
+#define PHYSICS_GUARD
 
-#pragma comment(lib, "chipmunk.lib")
+//#pragma comment(lib, "chipmunk.lib")
 
 #include <chipmunk/chipmunk.h>
 #include <FlatBuffer.h>
 #include <iostream>
 #include <time.h>
+#include "Vec.h"
+#include "FixedPoint.h"
 
 
-
-template<typename T>
-struct Vec2D {
-	T x, y;
-	__forceinline void operator+=(Vec2D& other) {
-		x += other.x;
-		y += other.y;
-	}
-	__forceinline void operator-=(Vec2D& other) {
-		x -= other.x;
-		y -= other.y;
-	}
-	__forceinline void operator/=(T& num) {
-		x /= num;
-		y /= num;
-	}
-};
 
 struct BodyID {
 	//uint32_t id;
@@ -33,8 +19,8 @@ struct BodyID {
 
 
 
-
-class PhysicsEngine {
+template<uint32_t width, uint32_t height, uint32_t hash_width, uint32_t max_bodies_per_hash = 64>
+class PhysicsEngineConvex2D {
 	static constexpr uint32_t max_bodies = 100000;
 	static constexpr uint32_t unit_size = 1000;
 	cpSpace* space;
@@ -47,7 +33,7 @@ public:
 	void init() {
 		space = cpSpaceNew();
 		cpSpaceSetIterations(space, 1);
-		cpSpaceUseSpatialHash(space, 64, 30000);
+		cpSpaceUseSpatialHash(space, hash_width, 30000);
 	}
 	void destroy() {
 		cpSpaceFree(space);
@@ -74,6 +60,10 @@ public:
 		cpSpaceAddBody(space, body);
 	}*/
 
+	void removeBody(BodyID id) {
+		//TODO: NEED TO FINISH THIS!
+	}
+
 	void* getUserData(BodyID id) {
 		return cpBodyGetUserData(id.id);
 	}
@@ -82,7 +72,19 @@ public:
 	}
 
 	FlatBuffer<BodyID, 100>& getOverlappingBodies(BodyID id) {
-		
+		return FlatBuffer<BodyID, 100>();  //TODO: FINISH THIS!
+	}
+
+	inline std::vector<BodyID> getBodiesInRectRough(Vec2D<int32_t>& pos, Vec2D<int32_t>& siz) {
+		pos *= unit_size; siz *= unit_size;
+		std::vector<BodyID> retValue;
+		//TODO: FINISH THIS!
+		return retValue;
+	}
+
+	Vec2D<int32_t> getMaxPositions() {
+		constexpr int32_t ceil = 2000 * 128 * unit_size;
+		return { ceil, ceil };
 	}
 
 	void addVelocity(BodyID id, float vx, float vy) {
@@ -94,16 +96,22 @@ public:
 		cpVect vel = { vx, vy };
 		cpBodySetVelocity(id.id, vel);
 	}
+	void setVelocity(BodyID id, FixedPoint<> vx, FixedPoint<> vy) {
+		cpVect vel;
+		vel.x = vx.getRaw();
+		vel.y = vy.getRaw();
+		cpBodySetVelocity(id.id, vel);
+	}
 
 	template<typename T>
 	Vec2D<T> getPos(BodyID id) {
 		cpVect pos = cpBodyGetPosition(id.id);
 		return { (T)pos.x, (T)pos.y };
 	}
-	/*template<typename T>
+	template<typename T>
 	Vec2D<T> getSize(BodyID id) {
-		
-	}*/
+		return { (T)64, (T)64 };  //TODO: NEEDS FIXING!
+	}
 
 	float getTime() {
 		return timeFromStepping;
@@ -115,3 +123,5 @@ public:
 		timeFromStepping = clock() - c;
 	}
 };
+
+#endif

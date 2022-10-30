@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PHYSICS_GUARD
+#define PHYSICS_GUARD
 
 #include "Vec.h"
 #include "FlatBuffer.h"
@@ -106,7 +107,7 @@ public:
 };
 
 template<uint32_t width, uint32_t height, uint32_t hash_width, uint32_t max_bodies_per_hash = 64>
-class PhysicsEngine {
+class PhysicsEngineAABB2D {
 	static constexpr uint32_t max_bodies = 100000;
 	static constexpr uint32_t unit_size = 256;  //used as a pretend "1" normalized value to emulate decimal
 	FlatFlaggedBuffer<BodyAABB, max_bodies> bodies = FlatFlaggedBuffer<BodyAABB, max_bodies>();
@@ -307,3 +308,5 @@ private:
 		return false;
 	}
 };
+
+#endif
