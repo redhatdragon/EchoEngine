@@ -17,10 +17,12 @@ set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}")
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/SDL2)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/SDL2_image)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/SDL2_ttf)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/Chipmunk2D)
 target_include_directories(EchoEngine PRIVATE
 	deps
 	deps/SDL2/include
 	${CMAKE_CURRENT_SOURCE_DIR}
+	deps/Chipmunk2D/include
 )
 target_link_libraries(EchoEngine
 	SDL2
@@ -28,6 +30,7 @@ target_link_libraries(EchoEngine
 	SDL2_ttf
 	SDL2main
 	#SDL2-static
+	chipmunk
 )
 
 

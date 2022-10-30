@@ -8,3 +8,5 @@ git clone https://github.com/freetype/freetype freetype
 cd ../../
 cmake ./
 cd ../
+
+git clone https://github.com/slembcke/Chipmunk2D deps/Chipmunk2D
