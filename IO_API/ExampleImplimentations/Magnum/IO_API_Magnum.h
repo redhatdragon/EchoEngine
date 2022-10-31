@@ -23,7 +23,7 @@ void recolorTexture(void* texture, uint8_t r, uint8_t g, uint8_t b) {
 	
 }
 void* getTexture(const char* fileName) {
-	
+	return 0;
 }
 void releaseTexture(void* texture) {
 	
@@ -42,7 +42,7 @@ void drawLine(int x1, int y1, int x2, int y2, uint8_t r, uint8_t g, uint8_t b, u
 }
 
 bool getKeyState(char k) {
-	
+	return false;
 }
 void getMouseState(uint8_t* leftButton, uint8_t* middleButton, uint8_t* rightButton) {
 	
@@ -108,28 +108,3 @@ void MyApplication::drawEvent() {
 	swapBuffers();
 }
 MAGNUM_APPLICATION_MAIN(MyApplication)
-
-
-
-/*int main(int argc, char* argv[]) {
-	appStart();
-
-	gameLoop:
-	{
-		appLoop();
-
-		uint32_t mili_per_frame = (1.f / FPSLimit)*1000;
-		clock_t endTime = clock();
-		clock_t differentialTime = endTime - startTime;
-		if (differentialTime < mili_per_frame) {
-			//SDL_Delay(mili_per_frame - differentialTime);
-			differentialTime = clock() - startTime;
-		}
-		FPS = (double)1000/((double)differentialTime);
-	} goto gameLoop;
-
-quit:
-	appEnd();
-
-	return 0;
-}*/
