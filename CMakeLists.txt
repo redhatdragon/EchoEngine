@@ -21,13 +21,31 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/SDL2)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/SDL2_image)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/SDL2_ttf)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/Chipmunk2D)
+
+#Magnum specific
+##find_package(Magnum REQUIRED GL Sdl2Application)
+#set_directory_properties(PROPERTIES CORRADE_USE_PEDANTIC_FLAGS ON)
+##add_executable(MyApplication MyApplication.cpp)
+#target_link_libraries(EchoEngine PRIVATE
+#    Magnum::Application
+#    Magnum::GL
+#    Magnum::Magnum
+#	Corrade
+#)
+# Make the executable a default target to build & run in Visual Studio
+#set_property(DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT MyApplication)
+#end
+
 set(MAGNUM_WITH_SDL2APPLICATION ON CACHE BOOL "" FORCE)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/depsVisible/magnum EXCLUDE_FROM_ALL)
+
 target_include_directories(EchoEngine PRIVATE
 	deps
 	deps/SDL2/include
 	${CMAKE_CURRENT_SOURCE_DIR}
 	deps/Chipmunk2D/include
+	#depsVisible/magnum/magnum/src
+	#depsVisible/magnum/corrade/src
 )
 target_link_libraries(EchoEngine
 	SDL2
@@ -36,6 +54,8 @@ target_link_libraries(EchoEngine
 	SDL2main
 	#SDL2-static
 	chipmunk
+	Magnum
+	#Corrade
 )
 
 
