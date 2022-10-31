@@ -7,7 +7,7 @@ add_library(EchoEngine STATIC
 	Name.cpp
 	profiler.cpp
 	BitBool/BitBool.cpp
-	IO_API/IO_API.c
+	"IO_API/IO_API.cpp"
 	IO_API/GUI/GUI.c
 )
 if(DEFINED APP_TYPE_3D)

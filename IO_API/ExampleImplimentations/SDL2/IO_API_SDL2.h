@@ -36,7 +36,7 @@ float FPS;
 float FPSLimit = 30;
 
 void drawTexture(void* texture, int x, int y, int w, int h) {
-	struct SDL_Texture* t = texture;
+	struct SDL_Texture* t = (struct SDL_Texture*)texture;
 	struct SDL_Rect r = { x, y, w, h };
 	SDL_RenderCopy(renderer, t, NULL, &r);
 }
@@ -51,7 +51,7 @@ void* getTexture(const char* fileName) {
 	return retValue;
 }
 void releaseTexture(void* texture) {
-	SDL_DestroyTexture(texture);
+	SDL_DestroyTexture((struct SDL_Texture*)texture);
 }
 void drawText(const char* str, int x, int y, unsigned int fontWidth) {
 	static unsigned int lastFontWidth = 0;

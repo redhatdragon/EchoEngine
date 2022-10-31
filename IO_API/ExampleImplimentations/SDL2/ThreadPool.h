@@ -5,6 +5,7 @@ extern "C" {
 #endif
 
 #include <SDL.h>
+#include <memory.h>
 
 struct ThreadHeader {
 	void (*func)(void*);
@@ -43,7 +44,8 @@ struct ThreadPool* ThreadPoolCreate(uint16_t maxThreadCount) {
 	self->threadHeader = (struct ThreadHeader*)malloc(sizeof(struct ThreadHeader) * maxThreadCount);
 	//memset(self->threadHeader, 0, sizeof(struct ThreadHeader) * maxThreadCount);  //Causes some kind of compile error
 	for (uint16_t i = 0; i < maxThreadCount; i++) {
-		self->threadHeader[i].func = self->threadHeader[i].inUse = self->threadHeader[i].param = self->threadHeader[i].terminate = NULL;
+		//self->threadHeader[i].func = self->threadHeader[i].inUse = self->threadHeader[i].param = self->threadHeader[i].terminate = NULL;
+		memset(&self->threadHeader[i], 0, sizeof(struct ThreadHeader));
 		//memset(self, 0, sizeof(struct ThreadPool));  //?
 		self->threads[i] = SDL_CreateThread((SDL_ThreadFunction)threadChamber, NULL, &self->threadHeader[i]);
 		//SDL_DetachThread(self->threads[i]);
