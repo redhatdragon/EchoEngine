@@ -1,0 +1,7 @@
+build*/
+*.kdev4
+*~
+
+#user defined (maybe not necessary)
+corrade/
+magnum/

@@ -10,3 +10,7 @@ cmake ./
 cd ../
 
 git clone https://github.com/slembcke/Chipmunk2D deps/Chipmunk2D
+cd depsVisible/magnum
+git clone https://github.com/mosra/corrade.git
+git clone https://github.com/mosra/magnum.git
+cd ../../

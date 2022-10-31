@@ -10,6 +10,9 @@ add_library(EchoEngine STATIC
 	IO_API/IO_API.c
 	IO_API/GUI/GUI.c
 )
+if(DEFINED APP_TYPE_3D)
+	target_compile_definitions(EchoEngine PRIVATE APP_TYPE_3D=${APP_TYPE_3D})
+endif()
 
 set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}")
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}")
@@ -18,6 +21,8 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/SDL2)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/SDL2_image)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/SDL2_ttf)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/Chipmunk2D)
+set(MAGNUM_WITH_SDL2APPLICATION ON CACHE BOOL "" FORCE)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/depsVisible/magnum EXCLUDE_FROM_ALL)
 target_include_directories(EchoEngine PRIVATE
 	deps
 	deps/SDL2/include
