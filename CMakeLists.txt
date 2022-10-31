@@ -7,7 +7,7 @@ add_library(EchoEngine STATIC
 	Name.cpp
 	profiler.cpp
 	BitBool/BitBool.cpp
-	"IO_API/IO_API.cpp"
+	IO_API/IO_API.cpp
 	IO_API/GUI/GUI.c
 )
 if(DEFINED APP_TYPE_3D)
@@ -23,21 +23,10 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/SDL2_ttf)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/Chipmunk2D)
 
 #Magnum specific
-##find_package(Magnum REQUIRED GL Sdl2Application)
-#set_directory_properties(PROPERTIES CORRADE_USE_PEDANTIC_FLAGS ON)
-##add_executable(MyApplication MyApplication.cpp)
-#target_link_libraries(EchoEngine PRIVATE
-#    Magnum::Application
-#    Magnum::GL
-#    Magnum::Magnum
-#	Corrade
-#)
-# Make the executable a default target to build & run in Visual Studio
-#set_property(DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT MyApplication)
-#end
-
+set_directory_properties(PROPERTIES CORRADE_USE_PEDANTIC_FLAGS ON)
 set(MAGNUM_WITH_SDL2APPLICATION ON CACHE BOOL "" FORCE)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/depsVisible/magnum EXCLUDE_FROM_ALL)
+#end
 
 target_include_directories(EchoEngine PRIVATE
 	deps
@@ -52,10 +41,12 @@ target_link_libraries(EchoEngine
 	SDL2_image
 	SDL2_ttf
 	SDL2main
-	#SDL2-static
+	#SDL2-static  #TODO: figure this out
 	chipmunk
-	Magnum
-	#Corrade
+	Magnum  #needed?
+	Magnum::Application
+    Magnum::GL
+    Magnum::Magnum
 )
 
 
