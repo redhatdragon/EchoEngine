@@ -45,8 +45,12 @@ target_link_libraries(EchoEngine
 	chipmunk
 	Magnum  #needed?
 	Magnum::Application
-    Magnum::GL
-    Magnum::Magnum
+    	Magnum::GL
+    	Magnum::Magnum
+    	Magnum::MeshTools
+    	Magnum::Primitives
+    	Magnum::SceneGraph
+    	Magnum::Shaders
 )
 
 
