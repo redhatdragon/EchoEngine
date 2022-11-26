@@ -9,6 +9,8 @@ Be of good cheer! o7
 ## WARNING: under construction...
 Under chaotic development at the moment, this is still in it's baby steps, please have a little patience, it'll get ironed out hopefully soon.
 
+2D only works on windows at the moment, 3D untested on linux.  Trying to wrangle cmake hell.  Expect things to break a lot for now.
+
 
 
 ## INSTALL
