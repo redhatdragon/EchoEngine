@@ -17,6 +17,12 @@
 #include <SDL_ttf.h>
 #include "ThreadPool.h"
 
+#ifdef USING_GL
+#include <gl\glew.h>
+#include <SDL_opengl.h>
+#include <gl\glu.h>
+#endif
+
 #include <time.h>
 #include <stdio.h>
 #include <Windows.h>
@@ -161,7 +167,7 @@ void setFPS(uint32_t fps) {
 	FPSLimit = fps;
 }
 
-int main(int argc, char *argv[]) {
+void initAsNormal() {
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 	window = SDL_CreateWindow("Some window title", 60, 40, 1024, 768, SDL_WINDOW_SHOWN);
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
@@ -176,6 +182,71 @@ int main(int argc, char *argv[]) {
 	printf("\n");
 	printf("System RAM: %d", SDL_GetSystemRAM());
 	printf("\n");
+}
+void initAsGL() {
+	const SDL_VideoInfo* info = NULL;
+	int width = 0;
+	int height = 0;
+	/* Color depth in bits of our window. */
+	int bpp = 0;
+	/* Flags we will pass into SDL_SetVideoMode. */
+	int flags = 0;
+
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0) {
+		fprintf(stderr, "Video initialization failed: %s\n",
+			SDL_GetError());
+	}
+	info = SDL_GetVideoInfo();
+
+	if (!info) {
+		fprintf(stderr, "Video query failed: %s\n",
+			SDL_GetError());
+	}
+	width = 640;
+	height = 480;
+	bpp = info->vfmt->BitsPerPixel;
+	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5);
+	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 5);
+	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5);
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+
+	/*
+	 * EXERCISE:
+	 * Make starting windowed an option, and
+	 * handle the resize events properly with
+	 * glViewport.
+	 */
+	flags = SDL_OPENGL | SDL_FULLSCREEN;
+
+	/*
+	 * Set the video mode
+	 */
+	if (SDL_SetVideoMode(width, height, bpp, flags) == 0) {
+		fprintf(stderr, "Video mode set failed: %s\n",
+			SDL_GetError());
+	}
+
+
+
+	if (IMG_Init(IMG_INIT_PNG) == 0)
+		printf("Failed to initialize SDL_Image");
+	if (TTF_Init() != 0)
+		printf("Failed to initialize SDL_ttf");
+	printf("CPU cache line size: %d", SDL_GetCPUCacheLineSize());
+	printf("\n");
+	printf("CPU core count: %d", SDL_GetCPUCount());
+	printf("\n");
+	printf("System RAM: %d", SDL_GetSystemRAM());
+	printf("\n");
+}
+
+int main(int argc, char *argv[]) {
+#if USING_GL
+	initAsGL();
+#else
+	initAsNormal();
+#endif
 	appStart();
 
 

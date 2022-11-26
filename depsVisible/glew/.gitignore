@@ -1,0 +1,11 @@
+*bin/
+*auto/
+*build/
+*config/
+*doc/
+*src/
+*include/
+*glew.pc.in
+*LICENSE.txt
+*README.md
+*Makefile

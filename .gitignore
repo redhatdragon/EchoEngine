@@ -1,7 +1,7 @@
 *Release
 *Debug
 *x64
-*.vs
+*.vs/
 *out
 *CMakeFiles
 *deps/

@@ -53,6 +53,11 @@ uint16_t cHeight = 0;
 
 HWND windowHandle;
 
+struct Texture {
+	uint16_t w, h;
+	uint32_t* data;
+};
+
 
 
 struct WaveHeader {
@@ -73,7 +78,7 @@ struct WaveHeader {
 
 
 
-void drawTextureFromFile(const char *fileName, int x, int y) {
+void IO_drawTextureFromFile(const char *fileName, int x, int y) {
 	typedef unsigned int uint;
 	uint32_t *buffer = 0;
 	unsigned int width, height;
@@ -93,7 +98,7 @@ void drawTextureFromFile(const char *fileName, int x, int y) {
 	}
 	free(buffer);
 }
-void drawTextureFromFileUnsafe(const char *fileName, int x, int y) {
+void IO_drawTextureFromFileUnsafe(const char *fileName, int x, int y) {
 	uint32_t *buffer = NULL;
 	unsigned int width, height;
 	getPNGData(fileName, &buffer, &width, &height);
@@ -103,9 +108,10 @@ void drawTextureFromFileUnsafe(const char *fileName, int x, int y) {
 	}
 	free(buffer);
 }
-void drawTexture(const struct Texture *texture, int _x, int _y) {
-	uint32_t *buffer = texture->data;
-	unsigned int width = texture->w, height = texture->h;
+void IO_drawTexture(void* texture, int _x, int _y) {
+	const struct Texture* tex = (const struct Texture*)texture;
+	const uint32_t *buffer = tex->data;
+	unsigned int width = tex->w, height = tex->h;
 	for (unsigned int i = 0; i < width; i++) {
 		for (unsigned int j = 0; j < height; j++) {
 			int x = i + _x, y = j + _y;
@@ -122,10 +128,11 @@ void drawTexture(const struct Texture *texture, int _x, int _y) {
 		}
 	}
 }
-void getTexture(const char *fileName, struct Texture *texture) {
+void* IO_getTexture(const char *fileName) {
+	struct Texture* retValue = (struct Texture*)malloc(sizeof(struct Texture));
 	uint32_t *buffer = NULL;
-	getPNGData(fileName, &buffer, &texture->w, &texture->h);
-	for (uint32_t i = 0; i < texture->w * texture->h; i++) {
+	getPNGData(fileName, &buffer, (unsigned int*)&retValue->w, (unsigned int*)&retValue->h);
+	for (uint32_t i = 0; i < retValue->w * retValue->h; i++) {
 		struct P {
 			uint8_t r, g, b, a;
 		};
@@ -136,9 +143,10 @@ void getTexture(const char *fileName, struct Texture *texture) {
 		p.b = r;
 		memcpy(&buffer[i], &p, sizeof(uint32_t));
 	}
-	texture->data = buffer;
+	retValue->data = buffer;
+	return retValue;
 }
-void resizeTexture(struct Texture* input, uint32_t width, uint32_t height) {
+void IO_resizeTexture(struct Texture* input, uint32_t width, uint32_t height) {
 	struct Texture output;
 	output.w = width; output.h = height;
 	output.data = (uint32_t*)malloc(width * height * sizeof(uint32_t));
@@ -160,7 +168,7 @@ void resizeTexture(struct Texture* input, uint32_t width, uint32_t height) {
 	free(input->data);
 	input->data = output.data;
 }
-void drawBackground(uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+void IO_drawBackground(uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
 	struct {
 		uint8_t r, g, b, a;
 	} color;
@@ -172,34 +180,33 @@ void drawBackground(uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
 	while (currentPixel < canvasEnd)
 		*currentPixel++ = c;
 }
-void drawText(const char* str, int x, int y, unsigned int fontWidth) {
-	struct Texture font;
-	getTexture("Font/MenuFont/MenuFont.png", &font);
+void IO_drawText(const char* str, int x, int y, unsigned int fontWidth) {
+	struct Texture* font = (struct Texture*)IO_getTexture("Font/MenuFont/MenuFont.png");
 	struct Texture glyph[128];
 	for (unsigned int i = 0; i < 128; i++) {
 		glyph[i].w = 8;
 		glyph[i].h = 16;
-		glyph[i].data = malloc(8 * 16 * sizeof(uint32_t));
+		glyph[i].data = (uint32_t*)malloc(8 * 16 * sizeof(uint32_t));
 		memset(glyph[i].data, 0, 8 * 16 * sizeof(uint32_t));
 		for (unsigned int j = 0; j < 16; j++) {
-			memcpy(&glyph[i].data[j*8], &font.data[(i*8)+font.w*j], 8*sizeof(uint32_t));
+			memcpy(&glyph[i].data[j*8], &font->data[(i*8)+font->w*j], 8*sizeof(uint32_t));
 		}
-		resizeTexture(&glyph[i], fontWidth, fontWidth * 2);
+		IO_resizeTexture(&glyph[i], fontWidth, fontWidth * 2);
 	}
 	{
 		size_t i = 0;
 		while (true) {
 			if (str[i] == 0) break;
-			drawTexture(&glyph[str[i]-' '], x+i*(fontWidth), y);
+			IO_drawTexture(&glyph[str[i]-' '], x+i*(fontWidth), y);
 			i++;
 		}
 	}
 	for (unsigned int i = 0; i < 128; i++) {
 		free(glyph[i].data);
 	}
-	free(font.data);
+	free(font->data);
 }
-void drawRect(int x, int y, int w, int h, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+void IO_drawRect(int x, int y, int w, int h, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
 	uint8_t color[4] = { b, g, r, a };
 	for (unsigned int i = 0; i < w; i++) {
 		for (unsigned int j = 0; j < h; j++) {
@@ -211,15 +218,15 @@ void drawRect(int x, int y, int w, int h, uint8_t r, uint8_t g, uint8_t b, uint8
 		}
 	}
 }
-void drawBloom(int x, int y, int w, int h, int intensity) {
+void IO_drawBloom(int x, int y, int w, int h, int intensity) {
 	struct Texture kernel;
 	kernel.w = w; kernel.h = h;
-	kernel.data = malloc(w*h*sizeof(uint32_t));
+	kernel.data = (uint32_t*)malloc(w*h*sizeof(uint32_t));
 	for (int i = 0; i < h; i++) {
 		memcpy(&kernel.data[0+i*w], &canvas[x + (y+i) * cWidth], w*sizeof(uint32_t));
 	}
-	resizeTexture(&kernel, w / intensity, h / intensity);
-	resizeTexture(&kernel, w, h);
+	IO_resizeTexture(&kernel, w / intensity, h / intensity);
+	IO_resizeTexture(&kernel, w, h);
 	for (int i = y; i < y+h; i++) {
 		for (int j = x; j < x+w; j++) {
 			canvas[j+i*cWidth] += kernel.data[(j-x)+(i-y)*w];
@@ -316,16 +323,18 @@ bool playAudioFile(const char* fileName, uint8_t loop) {
 	activeSoundCount++;*/
 
 	cs_loaded_sound_t tAudio = cs_load_wav(fileName);
-	cs_loaded_sound_t* audio = malloc(sizeof(struct cs_loaded_sound_t));
+	cs_loaded_sound_t* audio = (cs_loaded_sound_t*)malloc(sizeof(struct cs_loaded_sound_t));
 	memcpy(audio, &tAudio, sizeof(struct cs_loaded_sound_t));
 	cs_playing_sound_t tAudioInstance = cs_make_playing_sound(audio);
 	if (loop)
 		tAudioInstance.looped = true;
-	cs_playing_sound_t* audioInstance = malloc(sizeof(cs_playing_sound_t));
+	cs_playing_sound_t* audioInstance = (cs_playing_sound_t*)malloc(sizeof(cs_playing_sound_t));
 	memcpy(audioInstance, &tAudioInstance, sizeof(tAudioInstance));
 	activeSound[activeSoundCount] = audioInstance;
 	cs_insert_sound(ctx, activeSound[activeSoundCount]);
 	activeSoundCount++;
+
+	return true;
 }
 
 
@@ -373,7 +382,7 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
 		keyStates[wp] = false;
 		return 0;
 	case WM_CLOSE:		DestroyWindow(hWnd); return 0;
-	case WM_DESTROY:	appEnd(); exit(0); return 0;
+	case WM_DESTROY:	IO_appEnd(); exit(0); return 0;
 						//PostQuitMessage(0);  //May not be needed.
 	case WM_PAINT:		PaintWindow(hWnd);   return 0;
 	}
@@ -409,7 +418,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR args, int ncmdsho
 	//Initialize sound context
 	ctx = cs_make_context(windowHandle, 48000, 8192*10, 0, NULL);
 
-	appStart();
+	IO_appStart();
 	cs_spawn_mix_thread(ctx);
 
 	if (IsWindow(hWnd)) {
@@ -446,7 +455,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR args, int ncmdsho
 				activeSound[i] = activeSound[activeSoundCount];
 			}
 		}
-		appLoop();
+		IO_appLoop();
 		if (activeSoundCount);
 			//cs_mix(ctx);
 	}

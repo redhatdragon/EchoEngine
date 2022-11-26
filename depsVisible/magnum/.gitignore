@@ -3,5 +3,7 @@ build*/
 *~
 
 #user defined (maybe not necessary)
-corrade/
-magnum/
+*corrade/
+*magnum/
+#*modules/
+*src/
