@@ -12,6 +12,9 @@ public:
 	FixedPoint() {
 		data = 0;
 	}
+	FixedPoint(const char* str) {
+		fromString(str);
+	}
 	/*FixedPoint(const FixedPoint& other) {
 		uint32_t otherScale = other.getDecScale();
 		fromString(other.getAsString());
@@ -109,10 +112,16 @@ public:
 		if (this->data != other.data) return true;
 		return false;
 	}
+	inline FixedPoint<decScale> getABS() const {
+		if (this->data >= 0) return *this;
+		FixedPoint<decScale> retValue; retValue.data = -retValue.data;
+		return retValue;
+	}
 	inline int32_t getAsInt() const {
 		return data / decScale;
 	}
 	inline float getAsFloat() const {
+		if (data == 0) return 0;  //TODO: consider if this is needed and where else it may be needed to avoid runtime crashing.
 		return ((float)data) / decScale;
 	}
 	inline int32_t getRaw() const {
@@ -213,7 +222,7 @@ public:
 	//return fp_sqrt(number.getRaw(), 8);
 	return sqrt(number.getAsFloat());
 }*/
-int32_t sqrtI32(int32_t v) {
+inline int32_t sqrtI32(int32_t v) {
 	uint32_t b = 1 << 30, q = 0, r = v;
 	while (b > r)
 		b >>= 2;
@@ -228,7 +237,8 @@ int32_t sqrtI32(int32_t v) {
 	}
 	return q;
 }
-FixedPoint<> sqrt(const FixedPoint<>& var) {
+template<class T>
+inline T sqrt(const T& var) {
 	int32_t value = var.getAsInt();  //or value = input.getAsRaw()/256;
 	return sqrtI32(value);  //or retValue.setRaw(sqrt(value)*256);
 	
@@ -249,7 +259,7 @@ FixedPoint<> sqrt(const FixedPoint<>& var) {
 
 #ifdef TESTING
 #include <iostream>
-std::string T_FixedPointInitialize() {
+inline std::string T_FixedPointInitialize() {
 	FixedPoint<256> value;
 	std::string retValue = "";
 	value.fromString("321.123f");
@@ -260,7 +270,7 @@ std::string T_FixedPointInitialize() {
 	}
 	return "";
 }
-std::string T_FixedPointGetAsString() {
+inline std::string T_FixedPointGetAsString() {
 	FixedPoint<100> value;
 	value.fromString("0.3f");
 	if (value.getAsString() != "0.3f") {
@@ -270,7 +280,7 @@ std::string T_FixedPointGetAsString() {
 	}
 	return "";
 }
-std::string T_FixedPointArithmatic() {
+inline std::string T_FixedPointArithmatic() {
 	FixedPoint<> value;
 	std::string retValue = "Within...\n";
 	{
@@ -349,7 +359,7 @@ std::string T_FixedPointArithmatic() {
 	}
 	return retValue;
 }
-std::string T_FixedPointNegativeArithmatic() {
+inline std::string T_FixedPointNegativeArithmatic() {
 	FixedPoint<> value;
 	std::string retValue = "Within...\n";
 	{
@@ -395,7 +405,7 @@ std::string T_FixedPointNegativeArithmatic() {
 	}
 	return retValue;
 }
-std::string T_FixedPointSqrt() {
+inline std::string T_FixedPointSqrt() {
 	FixedPoint<> value;
 	value.fromString("9.5f"); 
 	value = sqrt(value);
@@ -410,8 +420,8 @@ std::string T_FixedPointSqrt() {
 	return "";
 }
 #endif
-void testFixedPoint() {
 #ifdef TESTING
+inline void testFixedPoint() {
 	std::string dbgStr = "";
 	dbgStr = T_FixedPointInitialize();
 	if (dbgStr != "") {
@@ -440,5 +450,5 @@ void testFixedPoint() {
 		std::cout << "T_FixedPointSqrt(): ";
 		std::cout << dbgStr << std::endl;
 	}
-#endif
 }
+#endif

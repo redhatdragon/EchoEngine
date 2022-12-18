@@ -1,19 +1,19 @@
 mkdir deps
 cd deps
-echo neglecting... git clone https://github.com/libsdl-org/SDL SDL2
-echo neglecting... git clone https://github.com/libsdl-org/SDL_image SDL2_image
-echo neglecting... git clone https://github.com/libsdl-org/SDL_ttf SDL2_ttf
-echo neglecting... cd SDL2_ttf/external
-echo neglecting... git clone https://github.com/freetype/freetype freetype
-echo neglecting... cd ../../
-echo disable...   cmake ./  (seriously why was this here?)
+git clone https://github.com/libsdl-org/SDL SDL2
+git clone https://github.com/libsdl-org/SDL_image SDL2_image
+git clone https://github.com/libsdl-org/SDL_ttf SDL2_ttf
+cd SDL2_ttf/external
+git clone https://github.com/freetype/freetype freetype
+cd ../../
+cmake ./
 cd ../
 
 git clone https://github.com/slembcke/Chipmunk2D deps/Chipmunk2D
 
 cd depsVisible/magnum
-echo neglecting... git clone https://github.com/mosra/corrade.git
-echo neglecting... git clone https://github.com/mosra/magnum.git
+git clone https://github.com/mosra/corrade.git
+git clone https://github.com/mosra/magnum.git
 cd ../../
 
 git clone https://github.com/glfw/glfw deps/glfw

@@ -1,5 +1,5 @@
 #pragma once
-#include "IO_API/IO_API.h"
+#include "HAL/HAL.h"
 #include <unordered_map>
 #include <iostream>
 
@@ -22,7 +22,7 @@ namespace TextureCodex {
 		}
 		textureCount++;
 		hashes[path] = textureCount;
-		void* newTexture = IO_getTexture(path.c_str());
+		void* newTexture = EE_getNewTexture(path.c_str());
 		textures[textureCount] = newTexture;
 		std::cout << "Caching new texture: " << textureCount << " " << path << std::endl;
 		return { textureCount };
@@ -46,11 +46,11 @@ namespace FileCodex {
 			refCount[element->second]++;
 			return { element->second };
 		}
-		char* newFileData = (char*)malloc(IO_fileGetSize(path.c_str()));
+		char* newFileData = (char*)malloc(EE_fileGetSize(path.c_str()));
 		if (newFileData == NULL) return { 0 };
 		fileCount++;
 		hashes[path] = fileCount;
-		IO_getFileText(path.c_str(), newFileData);
+		EE_getFileText(path.c_str(), newFileData);
 		fileDatas[fileCount] = newFileData;
 		std::cout << "Caching new file: " << fileCount << " " << path << std::endl;
 		return { fileCount };

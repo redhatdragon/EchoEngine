@@ -74,7 +74,7 @@ extern "C" {
 
 
  /** TAKEN FROM ORIGINAL fixedpoint.h */
-long fp_sincos(unsigned long phase, long* cos);
+inline long fp_sincos(unsigned long phase, long* cos);
 
 
 /** MODIFIED FROM replaygain.c */
@@ -85,7 +85,7 @@ long fp_sincos(unsigned long phase, long* cos);
  * calculating dB, lower is better for calculating factor.
  */
  /* long fp_decibels(unsigned long factor, unsigned int fracbits); */
-long fp_factor(long decibels, unsigned int fracbits);
+inline long fp_factor(long decibels, unsigned int fracbits);
 //end
 
 
@@ -154,7 +154,7 @@ static const short sin_table[91] =
  * @return sin of phase, value is a signed value from LONG_MIN to LONG_MAX,
  *         representing -1 and 1 respectively.
  */
-long fp_sincos(unsigned long phase, long* cos)
+inline long fp_sincos(unsigned long phase, long* cos)
 {
     int32_t x, x1, y, y1;
     unsigned long z, z1;
@@ -218,7 +218,7 @@ long fp_sincos(unsigned long phase, long* cos)
  * This routine has been modified to run longer for greater precision,
  * but cuts calculation short if the answer is reached sooner.
  */
-long fp_sqrt(long x, unsigned int fracbits)
+inline long fp_sqrt(long x, unsigned int fracbits)
 {
     unsigned long xfp, b;
     int n = 8; /* iteration limit (should terminate earlier) */
@@ -251,7 +251,7 @@ long fp_sqrt(long x, unsigned int fracbits)
 /* Accurate int sqrt with only elementary operations.
  * Snagged from:
  *   http://www.devmaster.net/articles/fixed-point-optimizations/ */
-unsigned long isqrt(unsigned long x)
+inline unsigned long isqrt(unsigned long x)
 {
     /* Adding CLZ could optimize this further */
     unsigned long g = 0;
@@ -283,7 +283,7 @@ unsigned long isqrt(unsigned long x)
  * @param val sinus argument in degree
  * @return sin(val)*16384
  */
-long fp14_sin(int val)
+inline long fp14_sin(int val)
 {
     val = (val + 360) % 360;
     if (val < 181)
@@ -309,7 +309,7 @@ long fp14_sin(int val)
  * @param val sinus argument in degree
  * @return cos(val)*16384
  */
-long fp14_cos(int val)
+inline long fp14_cos(int val)
 {
     val = (val + 360) % 360;
     if (val < 181)
@@ -338,7 +338,7 @@ long fp14_cos(int val)
  *   bits of precision to avoid loss of accuracy during shifts."
  */
 
-long fp16_log(int x) {
+inline long fp16_log(int x) {
     long t, y;
 
     y = 0xa65af;
@@ -369,7 +369,7 @@ long fp16_log(int x) {
  *   doing a multiplication: this is explained in the note below.
  *   The extension to negative arguments is left as an exercise."
  */
-long fp16_exp(int x)
+inline long fp16_exp(int x)
 {
     int t, y;
 
@@ -526,7 +526,7 @@ static long fp_log10(long n, unsigned int fracbits)
 
 
 /** CONVERT FACTOR TO DECIBELS */
-long fp_decibels(unsigned long factor, unsigned int fracbits)
+inline long fp_decibels(unsigned long factor, unsigned int fracbits)
 {
     /* decibels = 20 * log10(factor) */
     return FP_MUL_FRAC((20L << fracbits), fp_log10(factor, fracbits));
@@ -535,7 +535,7 @@ long fp_decibels(unsigned long factor, unsigned int fracbits)
 
 
 /** CONVERT DECIBELS TO FACTOR */
-long fp_factor(long decibels, unsigned int fracbits)
+inline long fp_factor(long decibels, unsigned int fracbits)
 {
     /* factor = 10 ^ (decibels / 20) */
     return fp_exp10(FP_DIV_FRAC(decibels, (20L << fracbits)), fracbits);

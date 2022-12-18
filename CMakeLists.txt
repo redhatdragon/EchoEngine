@@ -8,8 +8,8 @@ add_library(EchoEngine STATIC
 	Name.cpp
 	profiler.cpp
 	BitBool/BitBool.cpp
-	IO_API/IO_API.cpp
-	IO_API/GUI/GUI.c
+	HAL/HAL.cpp
+	HAL/GUI/GUI.c
 )
 if(DEFINED APP_TYPE_3D)
 	target_compile_definitions(EchoEngine PRIVATE APP_TYPE_3D=${APP_TYPE_3D})
@@ -18,11 +18,9 @@ endif()
 set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}")
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}")
 
-if(NOT DEFINED APP_TYPE_3D)
-	#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/SDL2)
-	#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/SDL2_image)
-	#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/SDL2_ttf)
-endif()
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/SDL2)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/SDL2_image)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/SDL2_ttf)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/Chipmunk2D)
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
@@ -33,38 +31,39 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/glm)
 #add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/glew)
 #add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/depsVisible/glew)
 
-#Magnum specific (Currently on hold)
-#set_directory_properties(PROPERTIES CORRADE_USE_PEDANTIC_FLAGS ON)
-#set(MAGNUM_WITH_SDL2APPLICATION ON CACHE BOOL "" FORCE)
-#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/depsVisible/magnum EXCLUDE_FROM_ALL)
+#Magnum specific
+set_directory_properties(PROPERTIES CORRADE_USE_PEDANTIC_FLAGS ON)
+set(MAGNUM_WITH_SDL2APPLICATION ON CACHE BOOL "" FORCE)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/depsVisible/magnum EXCLUDE_FROM_ALL)
 #end
 
 target_include_directories(EchoEngine PRIVATE
 	deps
-	#deps/SDL2/include
+	deps/SDL2/include
 	${CMAKE_CURRENT_SOURCE_DIR}
 	deps/Chipmunk2D/include
+	#depsVisible/magnum/magnum/src
+	#depsVisible/magnum/corrade/src
+	#deps/glew/include
 	depsVisible/glew/include
 	deps/glm
 	deps/OBJ-Loader/Source
 )
 target_link_libraries(EchoEngine
-	#SDL2
-	#SDL2_image
-	#SDL2_ttf
-	#SDL2main
-	
+	SDL2
+	SDL2_image
+	SDL2_ttf
+	SDL2main
 	#SDL2-static  #TODO: figure this out
 	chipmunk
-	#Magnum currently unused...
-	#Magnum  #needed?
-	#Magnum::Application
-    	#Magnum::GL
-    	#Magnum::Magnum
-    	#Magnum::MeshTools
-    	#Magnum::Primitives
-    	#Magnum::SceneGraph
-    	#Magnum::Shaders
+	Magnum  #needed?
+	Magnum::Application
+    	Magnum::GL
+    	Magnum::Magnum
+    	Magnum::MeshTools
+    	Magnum::Primitives
+    	Magnum::SceneGraph
+    	Magnum::Shaders
 	glfw
 	OpenGL::GL
 )
