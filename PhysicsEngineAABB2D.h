@@ -286,6 +286,12 @@ public:
 		timeFromStepping = (float)(clock() - c);
 	}
 
+	Vec2D<int32_t> getMaxPositions() {
+		constexpr int32_t ceilx = width * hash_width * unit_size;
+		constexpr int32_t ceily = height * hash_width * unit_size;
+		return { ceilx, ceily };
+	}
+
 private:
 	void overlappingBodyPushIfUnique(uint32_t index, BodyID id) {
 		for (uint32_t i = 0; i < overlappingBodyIDs[index].count; i++)

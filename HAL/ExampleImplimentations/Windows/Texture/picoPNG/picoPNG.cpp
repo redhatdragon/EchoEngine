@@ -561,7 +561,7 @@ void loadFile(std::vector<unsigned char>& buffer, const std::string& filename) /
 
 
 
-extern "C" {
+//extern "C" {
 uint8_t getPNGData(const char *fileName, uint32_t **outBuffer, unsigned int *outWidth, unsigned int *outHeight) {
 	std::vector<unsigned char> buffer, image;
 	loadFile(buffer, fileName);
@@ -578,7 +578,7 @@ uint8_t getPNGData(const char *fileName, uint32_t **outBuffer, unsigned int *out
 
 	return true;
 }
-}
+//}
 
 
 

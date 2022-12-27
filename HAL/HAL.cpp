@@ -23,5 +23,6 @@ extern "C" {
 #endif
 
 #else
-#include "ExampleImplimentations/SDL2/HAL_API_SDL2.h"
+//#include "ExampleImplimentations/SDL2/HAL_API_SDL2.h"
+#include "ExampleImplimentations/Windows/HAL_API_WIN32.h"
 #endif

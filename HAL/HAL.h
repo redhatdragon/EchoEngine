@@ -33,8 +33,8 @@ extern "C" {
 
 	//void drawTextureFromFile(const char* fileName, int x, int y);
 	void* EE_getNewTexture(const char* fileName);
-	//void resizeTexture(void* texture, uint32_t width, uint32_t height);
-	void EE_drawTexture(void* texture, int x, int y, int w, int h);
+	void EE_resizeTexture(void* texture, uint32_t width, uint32_t height);
+	void EE_drawTexture(void* texture, int x, int y);
 	void EE_recolorTexture(void* texture, uint8_t r, uint8_t g, uint8_t b);
 	void EE_releaseTexture(void* texture);
 	void EE_drawBackground(uint8_t r, uint8_t g, uint8_t b, uint8_t a);

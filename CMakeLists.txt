@@ -18,9 +18,9 @@ endif()
 set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}")
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}")
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/SDL2)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/SDL2_image)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/SDL2_ttf)
+#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/SDL2)
+#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/SDL2_image)
+#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/SDL2_ttf)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/Chipmunk2D)
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
@@ -32,14 +32,14 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/glm)
 #add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/depsVisible/glew)
 
 #Magnum specific
-set_directory_properties(PROPERTIES CORRADE_USE_PEDANTIC_FLAGS ON)
-set(MAGNUM_WITH_SDL2APPLICATION ON CACHE BOOL "" FORCE)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/depsVisible/magnum EXCLUDE_FROM_ALL)
+#set_directory_properties(PROPERTIES CORRADE_USE_PEDANTIC_FLAGS ON)
+#set(MAGNUM_WITH_SDL2APPLICATION ON CACHE BOOL "" FORCE)
+#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/depsVisible/magnum EXCLUDE_FROM_ALL)
 #end
 
 target_include_directories(EchoEngine PRIVATE
 	deps
-	deps/SDL2/include
+	#deps/SDL2/include
 	${CMAKE_CURRENT_SOURCE_DIR}
 	deps/Chipmunk2D/include
 	#depsVisible/magnum/magnum/src
@@ -50,20 +50,20 @@ target_include_directories(EchoEngine PRIVATE
 	deps/OBJ-Loader/Source
 )
 target_link_libraries(EchoEngine
-	SDL2
-	SDL2_image
-	SDL2_ttf
-	SDL2main
+	#SDL2
+	#SDL2_image
+	#SDL2_ttf
+	#SDL2main
 	#SDL2-static  #TODO: figure this out
 	chipmunk
-	Magnum  #needed?
-	Magnum::Application
-    	Magnum::GL
-    	Magnum::Magnum
-    	Magnum::MeshTools
-    	Magnum::Primitives
-    	Magnum::SceneGraph
-    	Magnum::Shaders
+	#Magnum  #needed?
+	#Magnum::Application
+    #	Magnum::GL
+    #	Magnum::Magnum
+    #	Magnum::MeshTools
+    #	Magnum::Primitives
+    #	Magnum::SceneGraph
+    #	Magnum::Shaders
 	glfw
 	OpenGL::GL
 )
