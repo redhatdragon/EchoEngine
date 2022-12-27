@@ -67,7 +67,8 @@ extern "C" {
 
 	bool EE_playAudioFile(const char* fileName, uint8_t loop);
 	bool EE_getNewAudio(const char* fileName, void* audioBuffer);
-	bool EE_playAudio(void* audio);
+	bool EE_playAudio(void* audio, uint8_t loop);
+	bool EE_stopAudio(void* audio);
 
 	bool EE_sendPacketUDP(void* packet);
 	struct EE_PacketUDP* EE_recvPacketUDP();

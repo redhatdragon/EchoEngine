@@ -380,7 +380,7 @@ std::string T_FlatFlaggedBufferBigInitialize() {
 	return "";
 }
 #endif
-void testFlatFlaggedBuffer() {
+inline void testFlatFlaggedBuffer() {
 #ifdef TESTING
 	std::string dbgStr = "";
 	dbgStr = T_FlatFlaggedBufferInitialize();

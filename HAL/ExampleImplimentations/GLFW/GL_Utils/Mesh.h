@@ -89,16 +89,16 @@ struct SubMesh {
         std::string shaderPath = EE_getDirData(); shaderPath += "ShadersGL/BasicMesh.shader";
         shader.init(shaderPath);
         textures.push_back(Texture());
-        //std::string texturePath = EE_getDirData(); texturePath += "Textures/RightArrow.png";
-        //textures[0].init(texturePath);
-        uint32_t textureCount = _textures.size();
-        for (uint32_t i = 0; i < textureCount; i++) {
-            textures.push_back(_textures[i]);
-        }
-        textures[0].bind();
-        shader.setUniform1i("u_texture", 0);
-        shader.setUniform4f("u_color", 1, 1, 1, 1);
-        shader.setUniformMat4f("u_MVP", {});
+        std::string texturePath = EE_getDirData(); texturePath += "Textures/RightArrow.png";
+        textures[0].init(texturePath);
+        //uint32_t textureCount = _textures.size();
+        //for (uint32_t i = 0; i < textureCount; i++) {
+        //    textures.push_back(_textures[i]);
+        //}
+        //textures[0].bind();
+        //shader.setUniform1i("u_texture", 0);
+        //shader.setUniform4f("u_color", 1, 1, 1, 1);
+        //shader.setUniformMat4f("u_MVP", {});
     }
     void destruct() {
         vertexBuffer.destruct();
@@ -114,6 +114,7 @@ struct SubMesh {
         //for(uint32_t i = 0; i < textures.size(); i++)
             //textures[i].bind(i);
         textures[0].bind();
+        shader.bind();
         shader.setUniform4f("u_color", 1, 1, 1, 1);
         shader.setUniform1i("u_texture", 0);
         glm::mat4 model = glm::mat4(1.0f);
@@ -122,14 +123,17 @@ struct SubMesh {
         model = glm::rotate(model, glm::radians(rot.y), { 0.0f, 1.0f, 0.0f });
         model = glm::rotate(model, glm::radians(rot.z), { 0.0f, 0.0f, 1.0f });
         model = glm::scale(model, { siz.x, siz.y, siz.z });
-        unsigned int winWidth, winHeight;
-        EE_getCanvasSize(&winWidth, &winHeight);
         glm::mat4 mvp = perspective * view * model;
         shader.setUniformMat4f("u_MVP", mvp);
-        shader.bind();
         vertexArray.bind();
 
         glDrawElements(GL_TRIANGLES, indexBuffer.getCount(), GL_UNSIGNED_SHORT, nullptr);
+
+        //vertexBuffer.unbind();
+        //indexBuffer.unbind();
+        //textures[0].unbind();
+        //shader.unbind();
+        //vertexArray.unbind();
     }
 };
 

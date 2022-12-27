@@ -25,7 +25,7 @@ void IndexBuffer::destruct() {
 void IndexBuffer::buffer(const void* data, uint32_t count, uint8_t bytesPerIndex) {
 	this->count = count;
 	bind();
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * bytesPerIndex, data, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * bytesPerIndex, data, GL_DYNAMIC_DRAW);
 }
 void IndexBuffer::bind() const {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);

@@ -3,6 +3,10 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+//#define GLFW_EXPOSE_NATIVE_GLX
+#define GLFW_EXPOSE_NATIVE_WGL
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include <GLFW/glfw3native.h>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -11,6 +15,12 @@
 #include <FlatBuffer.h>
 
 #include <HAL/HAL_3D.h>
+
+//#pragma comment(lib, "dsound.lib")
+//#pragma comment(lib, "dxguid.lib")  //TODO: check which of these are required for cs_
+//#pragma comment(lib, "winmm.lib")
+#define CUTE_SOUND_IMPLEMENTATION
+#include "cute_sound.h"
 
 void translateScreen2DToGL(float& x, float& y);
 
@@ -47,12 +57,19 @@ inline void translateScreen2DToGL(float& x, float& y) {
     x = out.x; y = out.y;
 }
 inline void translateScreen3DToGL(float& x, float& y, float& z) {
-    EE_Point3Df out;
+    /*EE_Point3Df out;
     unsigned int width, height;
     EE_getCanvasSize(&width, &height);
     out = { x / width, (y / height) * -1, (z / ((width + height) / 2)) * -1 };
     out.x += -1.0f; out.y += 1.0f;
-    x = out.x; y = out.y; z = out.z;
+    x = out.x; y = out.y; z = out.z;*/
+    EE_Point3Df out;
+    unsigned int width, height;
+    EE_getCanvasSize(&width, &height);
+    unsigned int avg = (width + height) / 2;
+    out = { x / avg, y / avg, z / avg };
+    out.x += -1.0f; out.y += 1.0f;
+    x = out.x; y = -out.y; z = -out.z;
 }
 
 
@@ -61,7 +78,8 @@ GLFWwindow* window;
 //TexturedQuad rectTexturedQuad;
 //std::vector<Quad> rectangles;
 std::vector<TexturedQuad> textures;
-FlatBuffer<Mesh, 1000000> meshes = {};
+//FlatBuffer<Mesh, 1000000> meshes = {};
+std::vector<Mesh*> meshes = {};
 //2D
 void EE_drawTexture(void* texture, int x, int y, int w, int h) {
     textures[(uint32_t)texture].draw(x, y, w, h);
@@ -119,6 +137,27 @@ const char* EE_getDirData() {
     return "../data/";
 }
 
+cs_context_t* cs_ctx;
+cs_playing_sound_t* activeSound[256];
+uint32_t activeSoundCount = 0;
+bool EE_playAudioFile(const char* fileName, uint8_t loop) {
+    cs_loaded_sound_t tAudio = cs_load_wav(fileName);
+    cs_loaded_sound_t* audio = (cs_loaded_sound_t*)malloc(sizeof(struct cs_loaded_sound_t));
+    memcpy(audio, &tAudio, sizeof(struct cs_loaded_sound_t));
+    cs_playing_sound_t tAudioInstance = cs_make_playing_sound(audio);
+    if (loop)
+        tAudioInstance.looped = true;  //TODO: Test
+    cs_playing_sound_t* audioInstance = (cs_playing_sound_t*)malloc(sizeof(cs_playing_sound_t));
+    memcpy(audioInstance, &tAudioInstance, sizeof(tAudioInstance));
+    activeSound[activeSoundCount] = audioInstance;
+    cs_insert_sound(cs_ctx, activeSound[activeSoundCount]);
+    activeSoundCount++;
+    return true;
+}
+//bool EE_getNewAudio(const char* fileName, void* audioBuffer);
+//bool EE_playAudio(void* audio, uint8_t loop);
+//bool EE_stopAudio(void* audio);
+
 //3D
 void EE_drawTriangle2DRGB(const EE_Point2Df points[3], EE_ColorR8G8B8 color) {
 
@@ -127,37 +166,48 @@ void EE_drawTriangle2DRGBVertex(const EE_Point2Df points[3], const EE_ColorR8G8B
 
 }
 void* EE_getNewMesh(const char* filepath) {
-    uint32_t retValue = meshes.count;
+    /*uint32_t retValue = meshes.count;
     meshes[retValue].init(filepath);
     meshes.count++;
+    return (void*)retValue;*/
+    Mesh* retValue = new Mesh();
+    retValue->init(filepath);
+    meshes.push_back(retValue);
     return (void*)retValue;
 }
 void EE_drawMesh(void* mesh) {
-    uint32_t meshID = (uint32_t)mesh;
+    Mesh* meshPtr = (Mesh*)mesh;
     //meshes[meshID].draw(viewMatrices.back(), perspective);
     if (activeSceneCamera)
-        meshes[meshID].draw(activeSceneCamera->GetViewMatrix(), perspective);
+        meshPtr->draw(activeSceneCamera->GetViewMatrix(), perspective);
     else
-        meshes[meshID].draw(viewMatrices.back(), perspective);
+        meshPtr->draw(viewMatrices.back(), perspective);
     //meshes[meshID].draw(glm::mat4(1), perspective);
 }
-
+void EE_setTextureSubmesh(void* mesh, uint8_t submeshIndex, uint8_t textureIndex, const char* path) {
+    Mesh* meshPtr = (Mesh*)mesh;
+    meshPtr->subMeshes[submeshIndex].textures[textureIndex].init(path);
+}
 void EE_setPositionMesh(void* mesh, float x, float y, float z) {
-    uint32_t meshID = (uint32_t)mesh;
+    Mesh* meshPtr = (Mesh*)mesh;
     translateScreen3DToGL(x, y, z);
-    meshes[meshID].pos = { x, y, z };
+    //y = -y;
+    //z = -z;
+    //meshPtr->pos = { x/1000, y/1000, z/1000 };
+    meshPtr->pos = { x, y, z };
 }
 void EE_setRotationMesh(void* mesh, float x, float y, float z) {
-    uint32_t meshID = (uint32_t)mesh;
-    meshes[meshID].rot = { x, y, z };
+    Mesh* meshPtr = (Mesh*)mesh;
+    meshPtr->rot = { x, y, z };
 }
 void EE_setScaleMesh(void* mesh, float x, float y, float z) {
-    uint32_t meshID = (uint32_t)mesh;
-    meshes[meshID].siz = { x, y, z };
+    Mesh* meshPtr = (Mesh*)mesh;
+    meshPtr->siz = { x, y, z };
 }
 
 void EE_releaseMesh(void* mesh) {
-    meshes[(uint32_t)mesh].destruct();
+    Mesh* meshPtr = (Mesh*)mesh;
+    meshPtr->destruct();
 }
 
 void EE_translate(float x, float y, float z) {
@@ -257,10 +307,17 @@ int main() {
 
     //camera = Camera();  //TODO: necessary?
 
+    //Initialize sound context
+    HWND hwnd = glfwGetWin32Window(window);
+    cs_ctx = cs_make_context(hwnd, 48000, 8192 * 10, 0, NULL);
     EE_appStart();
+    cs_spawn_mix_thread(cs_ctx);
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window)) {
+
+        static double startTime = glfwGetTime();
+
         EE_pushMatrix();
 
         /* Render here */
@@ -271,7 +328,18 @@ int main() {
         EE_getCanvasSize(&winWidth, &winHeight);
         perspective = glm::perspective(45.0f, (GLfloat)winWidth / (GLfloat)winHeight, 0.00001f, 150.0f);
 
+        for (size_t i = 0; i < activeSoundCount; i++) {
+            if (activeSound[i]->active == false) {
+                cs_free_sound(activeSound[i]->loaded_sound);
+                free(activeSound[i]->loaded_sound);
+                free(activeSound[i]);
+                activeSoundCount--;
+                activeSound[i] = activeSound[activeSoundCount];
+            }
+        }
         EE_appLoop();
+        if (activeSoundCount);
+            //cs_mix(ctx);
         getErrors();
 
         /* Swap front and back buffers */
@@ -281,6 +349,10 @@ int main() {
         glfwPollEvents();
 
         viewMatrices.clear();
+
+        while (glfwGetTime() < startTime + (1.0f / 60.0f)) {
+
+        }
     }
 
     EE_appEnd();

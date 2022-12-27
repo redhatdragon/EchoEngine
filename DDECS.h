@@ -27,7 +27,7 @@ class DDECS {
 		uint32_t componentSize;
 		std::string name;
 		inline void init(const std::string& componentName, uint32_t size) {
-			data = (uint8_t*)malloc(size * max_entities);
+			data = (uint8_t*)malloc((uint64_t)size * max_entities);
 			componentSize = size;
 			name = componentName;
 		}

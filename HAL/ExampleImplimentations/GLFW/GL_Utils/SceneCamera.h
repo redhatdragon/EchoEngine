@@ -2,12 +2,10 @@
 #include <Vec.h>
 #include <FixedPoint.h>
 
-struct SceneCamera {
+class SceneCamera {
 
     typedef float DECIMAL_TYPE;
 
-    static constexpr int DEFAULT_YAW = -90;  //TODO: needs changing...
-    static constexpr int DEFAULT_PITCH = 0;
     static constexpr int DEFAULT_ZOOM = 40;
 
     // camera Attributes
@@ -21,6 +19,7 @@ struct SceneCamera {
     //DECIMAL_TYPE pitch;
     // camera options
     DECIMAL_TYPE zoom;
+public:
 
     // constructor with vectors
     SceneCamera(Vec3D<DECIMAL_TYPE> _position = { 0.0f, 0.0f, 0.0f }, Vec3D<DECIMAL_TYPE> _up = { 0, 1, 0 }) {//, FixedPoint<> _yaw = DEFAULT_YAW, FixedPoint<> _pitch = DEFAULT_PITCH) : front(Vec3D<FixedPoint<>>{0, 0, -1}), zoom(DEFAULT_ZOOM) {
